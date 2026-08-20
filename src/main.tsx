@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import { MantineProvider } from '@mantine/core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { theme } from '@/core/theme'
 
 import '@mantine/core/styles.css'
 import './index.css'
@@ -13,7 +14,7 @@ const queryClient = new QueryClient()
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <MantineProvider>
+      <MantineProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <App />
         </QueryClientProvider>
