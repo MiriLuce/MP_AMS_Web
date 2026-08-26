@@ -1,17 +1,17 @@
-import { AppShell, Burger, Group, NavLink, Title } from '@mantine/core'
+import { AppShell, Burger, Group, NavLink, Title, ThemeIcon } from '@mantine/core'
 import { useMatch, NavLink as RouterNavLink, Outlet } from 'react-router'
 import { useDisclosure } from '@mantine/hooks'
-import { IconCalendar, IconHome, IconUsers } from '@tabler/icons-react'
+import { IconCalendar, IconHome, IconUsers, type TablerIcon } from '@tabler/icons-react'
 
 function NavLinkItem({
   to,
   label,
-  icon,
+  Icon,
   onNavigate,
 }: {
   to: string
   label: string
-  icon: React.ReactNode
+  Icon: TablerIcon
   onNavigate?: () => void
 }) {
   const match = useMatch({ path: to, end: to === '/' })
@@ -20,7 +20,11 @@ function NavLinkItem({
       component={RouterNavLink}
       to={to}
       label={label}
-      leftSection={icon}
+      leftSection={
+        <ThemeIcon size={30}>
+          <Icon size={18} />
+        </ThemeIcon>
+      }
       active={match !== null}
       onClick={onNavigate}
     />
@@ -60,17 +64,17 @@ function AppLayout() {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar>
-        <NavLinkItem to="/" label="Inicio" icon={<IconHome />} onNavigate={closeMobileNavBar} />
+        <NavLinkItem to="/" label="Inicio" Icon={IconHome} onNavigate={closeMobileNavBar} />
         <NavLinkItem
           to="/academic-years"
           label="Años Escolares"
-          icon={<IconCalendar />}
+          Icon={IconCalendar}
           onNavigate={closeMobileNavBar}
         />
         <NavLinkItem
           to="/employees"
           label="Empleados"
-          icon={<IconUsers />}
+          Icon={IconUsers}
           onNavigate={closeMobileNavBar}
         />
       </AppShell.Navbar>

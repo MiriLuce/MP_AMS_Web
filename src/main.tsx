@@ -5,6 +5,8 @@ import { MantineProvider } from '@mantine/core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { theme } from '@/core/theme'
 
+import '@fontsource-variable/inter'
+import '@fontsource-variable/plus-jakarta-sans'
 import '@mantine/core/styles.css'
 import './index.css'
 import App from './App.tsx'
