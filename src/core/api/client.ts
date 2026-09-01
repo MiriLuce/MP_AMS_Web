@@ -1,0 +1,25 @@
+import axios, { isCancel } from 'axios'
+import { toApiError } from './toApiError'
+
+export const apiClient = axios.create({
+  baseURL: '/api',
+  timeout: 10000, // Set a timeout of 10 seconds
+  headers: { 'Content-Type': 'application/json' },
+})
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (isCancel(error)) {
+      return Promise.reject(error)
+    }
+    const apiError = toApiError(error)
+    console.error(
+      '[API Error]:',
+      apiError.code,
+      apiError.message,
+      'traceId' in apiError ? apiError.traceId : '(sin traceId)',
+    )
+    return Promise.reject(apiError)
+  },
+)
