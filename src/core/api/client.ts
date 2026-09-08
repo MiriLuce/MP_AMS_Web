@@ -31,8 +31,11 @@ apiClient.interceptors.response.use(
     )
 
     if (apiError.kind === 'unauthenticated') {
-      useSessionStore.getState().logout()
-      console.warn('Sesión expirada. Redirigiendo al login...')
+      const hadSession = useSessionStore.getState().authState !== null
+      if (hadSession) {
+        useSessionStore.getState().endSession()
+        console.warn('Sesión expirada.')
+      }
     }
     return Promise.reject(apiError)
   },

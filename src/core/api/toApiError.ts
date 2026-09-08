@@ -47,7 +47,7 @@ export function toApiError(error: unknown): ApiError {
     case 401:
       return {
         kind: 'unauthenticated',
-        code: 'AUTH_UNAUTHENTICATED',
+        code: body.code ?? 'AUTH_UNAUTHENTICATED',
         message: body.message ?? 'Tu sesión no es válida o expiró. Vuelve a iniciar sesión.',
         traceId,
       }
