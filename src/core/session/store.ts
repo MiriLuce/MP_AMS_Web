@@ -3,14 +3,15 @@ import { jwtDecode } from 'jwt-decode'
 
 type AuthState = {
   token: string
-  expirationTime: number
+  expiresAt: number
   userId: string
   roles: Set<string> | undefined
   permissions: Set<string> | undefined
+  mustChangePassword: boolean
 }
 type SessionStore = {
   authState: AuthState | null
-  startSession: (token: string) => void
+  startSession: (token: string, mustChangePassword: boolean) => void
   endSession: () => void
 }
 
@@ -31,11 +32,11 @@ type DecodedToken = {
 
 export const useSessionStore = create<SessionStore>((set) => ({
   authState: null,
-  startSession: (token) => {
+  startSession: (token, mustChangePassword) => {
     const decodedToken: DecodedToken = jwtDecode(token)
     const authState = {
       token: token,
-      expirationTime: decodedToken.exp * 1000,
+      expiresAt: decodedToken.exp * 1000,
       userId: decodedToken.sub,
       roles:
         decodedToken.role === undefined
@@ -49,6 +50,7 @@ export const useSessionStore = create<SessionStore>((set) => ({
                 ? decodedToken.permission
                 : [decodedToken.permission],
             ),
+      mustChangePassword: mustChangePassword,
     }
     set({ authState })
   },

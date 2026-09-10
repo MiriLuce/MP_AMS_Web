@@ -11,9 +11,7 @@ import type { LoginRequest, LoginResponse } from './types'
 import { login } from './api'
 import classes from './LoginPage.module.css'
 
-export function LoginPage() {
-  // Con selector, no destructurando el store entero: sin él, el componente se re-renderiza ante
-  // cualquier cambio de sesión aunque solo use esta función, que nunca cambia.
+function LoginPage() {
   const startSession = useSessionStore((state) => state.startSession)
   const navigate = useNavigate()
 
@@ -40,7 +38,7 @@ export function LoginPage() {
   const loginMutation = useMutation<LoginResponse, ApiError, LoginRequest>({
     mutationFn: login,
     onSuccess: (response) => {
-      startSession(response.accessToken)
+      startSession(response.accessToken, response.mustChangePassword)
       if (response.mustChangePassword) {
         navigate('/change-password', { replace: true })
         return
@@ -89,3 +87,5 @@ export function LoginPage() {
     </Container>
   )
 }
+
+export default LoginPage
