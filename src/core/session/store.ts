@@ -5,14 +5,17 @@ type AuthState = {
   token: string
   expiresAt: number
   userId: string
+  userName: string
   roles: Set<string> | undefined
   permissions: Set<string> | undefined
   mustChangePassword: boolean
+  isLocked: boolean
 }
 type SessionStore = {
   authState: AuthState | null
-  startSession: (token: string, mustChangePassword: boolean) => void
+  startSession: (token: string, userName: string, mustChangePassword: boolean) => void
   endSession: () => void
+  lockSession: () => void
 }
 
 // La forma del JWT, no la de LoginResponse. Los nombres son los del token tal cual: los claims son
@@ -32,12 +35,13 @@ type DecodedToken = {
 
 export const useSessionStore = create<SessionStore>((set) => ({
   authState: null,
-  startSession: (token, mustChangePassword) => {
+  startSession: (token, userName, mustChangePassword) => {
     const decodedToken: DecodedToken = jwtDecode(token)
     const authState = {
       token: token,
       expiresAt: decodedToken.exp * 1000,
       userId: decodedToken.sub,
+      userName: userName,
       roles:
         decodedToken.role === undefined
           ? undefined
@@ -51,10 +55,20 @@ export const useSessionStore = create<SessionStore>((set) => ({
                 : [decodedToken.permission],
             ),
       mustChangePassword: mustChangePassword,
+      isLocked: false,
     }
     set({ authState })
   },
   endSession: () => {
     set({ authState: null })
+  },
+  lockSession: () => {
+    set((state) => ({
+      authState: state.authState 
+        ? state.authState.isLocked 
+          ? state.authState 
+          : { ...state.authState, isLocked: true }
+        : null,
+    }))
   },
 }))

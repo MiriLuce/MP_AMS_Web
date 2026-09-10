@@ -1,6 +1,5 @@
-import { Button, Container, Paper, PasswordInput, TextInput, Title } from '@mantine/core'
+import { Button, Container, Group, Paper, PasswordInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { useNavigate } from 'react-router'
 import { Alert } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
@@ -11,26 +10,15 @@ import type { LoginRequest, LoginResponse } from './types'
 import { login } from './api'
 import classes from './LoginPage.module.css'
 
-function LoginPage() {
+function UnlockScreen() {
   const startSession = useSessionStore((state) => state.startSession)
-  const navigate = useNavigate()
+  const endSession = useSessionStore((state) => state.endSession)
+  const authState = useSessionStore((state) => state.authState)
 
   const form = useForm({
     mode: 'uncontrolled',
-    initialValues: { userName: '', password: '' },
+    initialValues: { password: '' },
     validate: {
-      userName: (value: string) => {
-        if (!value.trim()) {
-          return 'El nombre de usuario es obligatorio.'
-        }
-        if (value.length > 20) {
-          return 'El nombre de usuario no puede exceder 20 caracteres.'
-        }
-        if (!/^[a-zA-Z0-9]+$/.test(value)) {
-          return 'El nombre de usuario solo puede contener letras y dígitos.'
-        }
-        return null
-      },
       password: (value) => (value.trim() ? null : 'La contraseña es obligatoria.'),
     },
   })
@@ -39,36 +27,29 @@ function LoginPage() {
     mutationFn: login,
     onSuccess: (response) => {
       startSession(response.accessToken, response.user.userName, response.mustChangePassword)
-      if (response.mustChangePassword) {
-        navigate('/change-password', { replace: true })
-        return
-      }
-      navigate('/', { replace: true })
     },
   })
+
+  if (authState === null) return null
+
+  const handleSubmit = (values: { password: string }) => {
+    loginMutation.mutate({ userName: authState.userName, password: values.password })
+  }
 
   return (
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
-        Bienvenido a <span className={classes.highlight}>Colegios y Academia Max Planck</span>
+        Desbloquear sesión de{' '}
+        <span className={classes.highlight}>Colegios y Academia Max Planck</span>
       </Title>
 
       <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
-        <form noValidate onSubmit={form.onSubmit((values) => loginMutation.mutate(values))}>
+        <form noValidate onSubmit={form.onSubmit(handleSubmit)}>
           {loginMutation.isError && (
             <Alert variant="light" color="red" title="Error" icon={<IconInfoCircle />} mb="md">
               {loginMutation.error.message}
             </Alert>
           )}
-          <TextInput
-            radius="md"
-            label="Usuario"
-            placeholder="Ingresa tu usuario"
-            autoComplete="username"
-            required
-            key={form.key('userName')}
-            {...form.getInputProps('userName')}
-          />
           <PasswordInput
             radius="md"
             mt="md"
@@ -79,13 +60,18 @@ function LoginPage() {
             key={form.key('password')}
             {...form.getInputProps('password')}
           />
-          <Button fullWidth mt="xl" radius="md" type="submit" loading={loginMutation.isPending}>
-            Iniciar sesión
-          </Button>
+          <Group justify="space-between">
+            <Button mt="md" radius="md" type="submit" loading={loginMutation.isPending}>
+              Desbloquear
+            </Button>
+            <Button mt="md" radius="md" variant="subtle" onClick={endSession}>
+              Cerrar sesión
+            </Button>
+          </Group>
         </form>
       </Paper>
     </Container>
   )
 }
 
-export default LoginPage
+export default UnlockScreen
