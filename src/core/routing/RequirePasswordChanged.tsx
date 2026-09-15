@@ -4,7 +4,7 @@ import { useSessionStore } from '@/core/session/store'
 function RequirePasswordChanged() {
   const authState = useSessionStore((state) => state.authState)
   if (authState === null) return <Navigate to="/login" replace />
-  if (authState.mustChangePassword) return <Navigate to="/change-password" replace />
+  if (authState.mustChangePassword) return <Navigate to="/set-password" replace />
   return <Outlet />
 }
 

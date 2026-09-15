@@ -23,3 +23,12 @@ export type LoginRequest = {
   userName: string
   password: string
 }
+
+export type ChangePasswordRequest = {
+  currentPassword: string
+  newPassword: string
+}
+
+export type ChangePasswordResponse = {
+  message: string
+}

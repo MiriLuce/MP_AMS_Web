@@ -1,7 +1,6 @@
-import { Button, Container, Group, Paper, PasswordInput, Title } from '@mantine/core'
+import { Alert, Button, Group, PasswordInput, Stack, Text, ThemeIcon, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { Alert } from '@mantine/core'
-import { IconInfoCircle } from '@tabler/icons-react'
+import { IconInfoCircle, IconLock } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 
 import { useSessionStore } from '@/core/session/store'
@@ -25,8 +24,13 @@ function UnlockScreen() {
 
   const loginMutation = useMutation<LoginResponse, ApiError, LoginRequest>({
     mutationFn: login,
-    onSuccess: (response) => {
-      startSession(response.accessToken, response.user.userName, response.mustChangePassword)
+    onSuccess: (response, variables) => {
+      startSession({
+        token: response.accessToken,
+        userName: response.user.userName,
+        mustChangePassword: response.mustChangePassword,
+        password: variables.password,
+      })
     },
   })
 
@@ -37,40 +41,48 @@ function UnlockScreen() {
   }
 
   return (
-    <Container size={420} my={40}>
-      <Title ta="center" className={classes.title}>
-        Desbloquear sesión de{' '}
-        <span className={classes.highlight}>Colegios y Academia Max Planck</span>
-      </Title>
+    <Stack gap="lg">
+      <Stack gap="xs" align="center">
+        <ThemeIcon size={48} radius="xl">
+          <IconLock size={26} />
+        </ThemeIcon>
+        <Title order={3} ta="center" className={classes.title}>
+          Sesión bloqueada
+        </Title>
+        <Text c="dimmed" size="sm" ta="center">
+          Ingresa tu contraseña para volver a{' '}
+          <span className={classes.highlight}>Colegios y Academia Max Planck</span>
+        </Text>
+      </Stack>
 
-      <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
-        <form noValidate onSubmit={form.onSubmit(handleSubmit)}>
+      <form noValidate onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack gap="md">
           {loginMutation.isError && (
-            <Alert variant="light" color="red" title="Error" icon={<IconInfoCircle />} mb="md">
+            <Alert variant="light" color="red" title="Error" icon={<IconInfoCircle />}>
               {loginMutation.error.message}
             </Alert>
           )}
           <PasswordInput
-            radius="md"
-            mt="md"
             label="Contraseña"
             placeholder="Ingresa tu contraseña"
             autoComplete="current-password"
             required
+            data-autofocus
             key={form.key('password')}
             {...form.getInputProps('password')}
           />
-          <Group justify="space-between">
-            <Button mt="md" radius="md" type="submit" loading={loginMutation.isPending}>
-              Desbloquear
-            </Button>
-            <Button mt="md" radius="md" variant="subtle" onClick={endSession}>
-              Cerrar sesión
-            </Button>
-          </Group>
-        </form>
-      </Paper>
-    </Container>
+          <Button fullWidth type="submit" loading={loginMutation.isPending}>
+            Desbloquear
+          </Button>
+        </Stack>
+      </form>
+
+      <Group justify="center">
+        <Button type="button" variant="subtle" size="sm" onClick={endSession}>
+          Cerrar sesión
+        </Button>
+      </Group>
+    </Stack>
   )
 }
 

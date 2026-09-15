@@ -1,15 +1,27 @@
-import { Button, Container, Paper, PasswordInput, TextInput, Title } from '@mantine/core'
+import {
+  Button,
+  Container,
+  Paper,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useNavigate } from 'react-router'
-import { Alert } from '@mantine/core'
-import { IconInfoCircle } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 
 import { useSessionStore } from '@/core/session/store'
+import ApiErrorAlert from '@/shared/ApiErrorAlert'
 import type { ApiError } from '@/core/api/errors'
 import type { LoginRequest, LoginResponse } from './types'
 import { login } from './api'
 import classes from './LoginPage.module.css'
+
+// Espeja IdentifierRules del backend (ADR-004: el userName es el documento de identidad).
+// Si esta constante y la del servidor se separan, se crea gente que no puede entrar.
+const USER_NAME_MAX_LENGTH = 20
 
 function LoginPage() {
   const startSession = useSessionStore((state) => state.startSession)
@@ -23,11 +35,11 @@ function LoginPage() {
         if (!value.trim()) {
           return 'El nombre de usuario es obligatorio.'
         }
-        if (value.length > 20) {
-          return 'El nombre de usuario no puede exceder 20 caracteres.'
+        if (value.length > USER_NAME_MAX_LENGTH) {
+          return `El nombre de usuario no puede exceder ${USER_NAME_MAX_LENGTH} caracteres.`
         }
         if (!/^[a-zA-Z0-9]+$/.test(value)) {
-          return 'El nombre de usuario solo puede contener letras y dígitos.'
+          return 'El nombre de usuario solo puede contener letras y dígitos, sin espacios, tildes ni símbolos.'
         }
         return null
       },
@@ -37,10 +49,17 @@ function LoginPage() {
 
   const loginMutation = useMutation<LoginResponse, ApiError, LoginRequest>({
     mutationFn: login,
-    onSuccess: (response) => {
-      startSession(response.accessToken, response.user.userName, response.mustChangePassword)
+    onSuccess: (response, variables) => {
+      // La contraseña viaja al store solo si hay que cambiarla: SetPasswordPage la manda como
+      // `currentPassword` para no pedirla de nuevo. Si no, el store la descarta.
+      startSession({
+        token: response.accessToken,
+        userName: response.user.userName,
+        mustChangePassword: response.mustChangePassword,
+        password: variables.password,
+      })
       if (response.mustChangePassword) {
-        navigate('/change-password', { replace: true })
+        navigate('/set-password', { replace: true })
         return
       }
       navigate('/', { replace: true })
@@ -48,40 +67,42 @@ function LoginPage() {
   })
 
   return (
-    <Container size={420} my={40}>
-      <Title ta="center" className={classes.title}>
-        Bienvenido a <span className={classes.highlight}>Colegios y Academia Max Planck</span>
-      </Title>
+    <Container size={420} my={60}>
+      <Stack gap="xs" mb="xl">
+        <Title order={2} ta="center" className={classes.title}>
+          Bienvenido a <span className={classes.highlight}>Colegios y Academia Max Planck</span>
+        </Title>
+        <Text c="dimmed" size="sm" ta="center">
+          Ingresa con tu documento de identidad y tu contraseña.
+        </Text>
+      </Stack>
 
-      <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
+      <Paper withBorder shadow="sm" p="xl">
         <form noValidate onSubmit={form.onSubmit((values) => loginMutation.mutate(values))}>
-          {loginMutation.isError && (
-            <Alert variant="light" color="red" title="Error" icon={<IconInfoCircle />} mb="md">
-              {loginMutation.error.message}
-            </Alert>
-          )}
-          <TextInput
-            radius="md"
-            label="Usuario"
-            placeholder="Ingresa tu usuario"
-            autoComplete="username"
-            required
-            key={form.key('userName')}
-            {...form.getInputProps('userName')}
-          />
-          <PasswordInput
-            radius="md"
-            mt="md"
-            label="Contraseña"
-            placeholder="Ingresa tu contraseña"
-            autoComplete="current-password"
-            required
-            key={form.key('password')}
-            {...form.getInputProps('password')}
-          />
-          <Button fullWidth mt="xl" radius="md" type="submit" loading={loginMutation.isPending}>
-            Iniciar sesión
-          </Button>
+          <Stack gap="md">
+            {loginMutation.isError && <ApiErrorAlert error={loginMutation.error} />}
+            <TextInput
+              label="Usuario"
+              description="Es tu documento de identidad, sin espacios ni guiones."
+              placeholder="Ej. 45678912"
+              autoComplete="username"
+              required
+              data-autofocus
+              key={form.key('userName')}
+              {...form.getInputProps('userName')}
+            />
+            <PasswordInput
+              label="Contraseña"
+              placeholder="Ingresa tu contraseña"
+              autoComplete="current-password"
+              required
+              key={form.key('password')}
+              {...form.getInputProps('password')}
+            />
+            <Button fullWidth mt="xs" type="submit" loading={loginMutation.isPending}>
+              Iniciar sesión
+            </Button>
+          </Stack>
         </form>
       </Paper>
     </Container>

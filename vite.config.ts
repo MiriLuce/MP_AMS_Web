@@ -15,7 +15,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5121',
+        target: 'https://app-mp-ams-dev-djc8hyfff9c7hvb7.centralus-01.azurewebsites.net/', //'http://localhost:5121',
         changeOrigin: true,
       },
     },

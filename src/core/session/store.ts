@@ -9,13 +9,30 @@ type AuthState = {
   roles: Set<string> | undefined
   permissions: Set<string> | undefined
   mustChangePassword: boolean
+  // La contraseña temporal con la que se acaba de entrar, guardada solo mientras
+  // `mustChangePassword` la exija. SetPasswordPage la manda como `currentPassword`, así la persona
+  // no retipea lo que escribió hace cinco segundos y el endpoint sigue exigiendo la contraseña
+  // anterior — que es lo único que distingue a la dueña de la cuenta de quien solo robó el token.
+  // La limpia `passwordChanged()`; `endSession()` se la lleva puesta. Nunca sale de la pestaña.
+  temporaryPassword: string | null
   isLocked: boolean
 }
+
+// Objeto y no cuatro posicionales: el tercer argumento es un booleano suelto, y en el call site
+// `startSession(t, u, false, p)` no se puede leer sin abrir esta definición.
+type StartSessionInput = {
+  token: string
+  userName: string
+  mustChangePassword: boolean
+  password: string
+}
+
 type SessionStore = {
   authState: AuthState | null
-  startSession: (token: string, userName: string, mustChangePassword: boolean) => void
+  startSession: (input: StartSessionInput) => void
   endSession: () => void
   lockSession: () => void
+  passwordChanged: () => void
 }
 
 // La forma del JWT, no la de LoginResponse. Los nombres son los del token tal cual: los claims son
@@ -35,7 +52,7 @@ type DecodedToken = {
 
 export const useSessionStore = create<SessionStore>((set) => ({
   authState: null,
-  startSession: (token, userName, mustChangePassword) => {
+  startSession: ({ token, userName, mustChangePassword, password }) => {
     const decodedToken: DecodedToken = jwtDecode(token)
     const authState = {
       token: token,
@@ -55,6 +72,7 @@ export const useSessionStore = create<SessionStore>((set) => ({
                 : [decodedToken.permission],
             ),
       mustChangePassword: mustChangePassword,
+      temporaryPassword: mustChangePassword ? password : null,
       isLocked: false,
     }
     set({ authState })
@@ -64,10 +82,19 @@ export const useSessionStore = create<SessionStore>((set) => ({
   },
   lockSession: () => {
     set((state) => ({
-      authState: state.authState 
-        ? state.authState.isLocked 
-          ? state.authState 
+      authState: state.authState
+        ? state.authState.isLocked
+          ? state.authState
           : { ...state.authState, isLocked: true }
+        : null,
+    }))
+  },
+  passwordChanged: () => {
+    set((state) => ({
+      authState: state.authState
+        ? state.authState.mustChangePassword
+          ? { ...state.authState, mustChangePassword: false, temporaryPassword: null }
+          : state.authState
         : null,
     }))
   },
