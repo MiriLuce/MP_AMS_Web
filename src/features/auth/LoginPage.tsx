@@ -1,5 +1,6 @@
 import {
   Button,
+  Center,
   Container,
   Paper,
   PasswordInput,
@@ -67,45 +68,47 @@ function LoginPage() {
   })
 
   return (
-    <Container size={420} my={60}>
-      <Stack gap="xs" mb="xl">
-        <Title order={2} ta="center" className={classes.title}>
-          Bienvenido a <span className={classes.highlight}>Colegios y Academia Max Planck</span>
-        </Title>
-        <Text c="dimmed" size="sm" ta="center">
-          Ingresa con tu documento de identidad y tu contraseña.
-        </Text>
-      </Stack>
+    <Center mih="100dvh" px="md">
+      <Container size={420} w="100%">
+        <Stack gap="xs" mb="xl">
+          <Title order={2} ta="center" className={classes.title}>
+            Bienvenido a <span className={classes.highlight}>Colegios y Academia Max Planck</span>
+          </Title>
+          <Text c="dimmed" size="sm" ta="center">
+            Ingresa con tu documento de identidad y tu contraseña.
+          </Text>
+        </Stack>
 
-      <Paper withBorder shadow="sm" p="xl">
-        <form noValidate onSubmit={form.onSubmit((values) => loginMutation.mutate(values))}>
-          <Stack gap="md">
-            {loginMutation.isError && <ApiErrorAlert error={loginMutation.error} />}
-            <TextInput
-              label="Usuario"
-              description="Es tu documento de identidad, sin espacios ni guiones."
-              placeholder="Ej. 45678912"
-              autoComplete="username"
-              required
-              data-autofocus
-              key={form.key('userName')}
-              {...form.getInputProps('userName')}
-            />
-            <PasswordInput
-              label="Contraseña"
-              placeholder="Ingresa tu contraseña"
-              autoComplete="current-password"
-              required
-              key={form.key('password')}
-              {...form.getInputProps('password')}
-            />
-            <Button fullWidth mt="xs" type="submit" loading={loginMutation.isPending}>
-              Iniciar sesión
-            </Button>
-          </Stack>
-        </form>
-      </Paper>
-    </Container>
+        <Paper withBorder shadow="sm" p="xl">
+          <form noValidate onSubmit={form.onSubmit((values) => loginMutation.mutate(values))}>
+            <Stack gap="md">
+              {loginMutation.isError && <ApiErrorAlert error={loginMutation.error} />}
+              <TextInput
+                label="Usuario"
+                description="Es tu documento de identidad, sin espacios ni guiones."
+                placeholder="Ej. 45678912"
+                autoComplete="username"
+                required
+                data-autofocus
+                key={form.key('userName')}
+                {...form.getInputProps('userName')}
+              />
+              <PasswordInput
+                label="Contraseña"
+                placeholder="Ingresa tu contraseña"
+                autoComplete="current-password"
+                required
+                key={form.key('password')}
+                {...form.getInputProps('password')}
+              />
+              <Button fullWidth mt="xs" type="submit" loading={loginMutation.isPending}>
+                Iniciar sesión
+              </Button>
+            </Stack>
+          </form>
+        </Paper>
+      </Container>
+    </Center>
   )
 }
 

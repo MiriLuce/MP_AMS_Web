@@ -68,7 +68,10 @@ function SetPasswordPage() {
           Define tu contraseña
         </Title>
         <Text c="dimmed" size="sm" ta="center">
-          Entraste con una contraseña temporal. Elige una propia para continuar.
+          Entraste con una contraseña temporal.
+        </Text>
+        <Text c="dimmed" size="sm" ta="center">
+          Elige una propia para continuar.
         </Text>
       </Stack>
 

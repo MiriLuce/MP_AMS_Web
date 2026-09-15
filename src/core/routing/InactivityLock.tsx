@@ -4,8 +4,18 @@ import { useSessionStore } from '@/core/session/store'
 import UnlockScreen from '@/features/auth/UnlockScreen'
 import { useEffect, useRef } from 'react'
 
-const LIMIT_INACTIVITY_TIME = 15 * 60 * 1000 // 15 minutes
-const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'] as const
+const LIMIT_INACTIVITY_TIME = 15 * 60  * 1000
+
+// Deliberadamente NO están `visibilitychange` ni el `focus` de la ventana: volver a la pestaña
+// después de veinte minutos afuera es justo cuando el bloqueo tiene que estar puesto.
+const ACTIVITY_EVENTS = [
+  'mousemove',
+  'mousedown',
+  'keydown',
+  'scroll',
+  'touchstart',
+  'popstate', // navegación con el botón atrás/adelante del navegador
+] as const
 
 function InactivityLock() {
   const lockSession = useSessionStore((state) => state.lockSession)
