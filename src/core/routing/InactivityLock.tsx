@@ -4,7 +4,7 @@ import { useSessionStore } from '@/core/session/store'
 import UnlockScreen from '@/features/auth/UnlockScreen'
 import { useEffect, useRef } from 'react'
 
-const LIMIT_INACTIVITY_TIME = 15 * 60  * 1000
+const LIMIT_INACTIVITY_TIME = 15 * 60 * 1000
 
 // Deliberadamente NO están `visibilitychange` ni el `focus` de la ventana: volver a la pestaña
 // después de veinte minutos afuera es justo cuando el bloqueo tiene que estar puesto.

@@ -1,0 +1,4 @@
+# `core.autocrlf=true` convierte a CRLF en el checkout, y Prettier exige LF (su default desde la
+# v2). Sin esta linea, en un clon nuevo `prettier --check` falla en TODOS los archivos, con un
+# mensaje que no menciona los fines de linea.
+* text=auto eol=lf
