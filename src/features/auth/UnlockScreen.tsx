@@ -28,6 +28,8 @@ function UnlockScreen() {
       startSession({
         token: response.accessToken,
         userName: response.user.userName,
+        firstName: response.user.firstName,
+        fatherLastName: response.user.fatherLastName,
         mustChangePassword: response.mustChangePassword,
         password: variables.password,
       })

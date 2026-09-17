@@ -6,6 +6,8 @@ type AuthState = {
   expiresAt: number
   userId: string
   userName: string
+  displayName: string
+  avatarName: string
   roles: Set<string> | undefined
   permissions: Set<string> | undefined
   mustChangePassword: boolean
@@ -23,6 +25,8 @@ type AuthState = {
 type StartSessionInput = {
   token: string
   userName: string
+  firstName: string
+  fatherLastName: string
   mustChangePassword: boolean
   password: string
 }
@@ -52,13 +56,15 @@ type DecodedToken = {
 
 export const useSessionStore = create<SessionStore>((set) => ({
   authState: null,
-  startSession: ({ token, userName, mustChangePassword, password }) => {
+  startSession: ({ token, userName, firstName, fatherLastName, mustChangePassword, password }) => {
     const decodedToken: DecodedToken = jwtDecode(token)
     const authState = {
       token: token,
       expiresAt: decodedToken.exp * 1000,
       userId: decodedToken.sub,
       userName: userName,
+      displayName: `${firstName} ${fatherLastName}`,
+      avatarName: `${firstName[0]}${fatherLastName[0]}`,
       roles:
         decodedToken.role === undefined
           ? undefined

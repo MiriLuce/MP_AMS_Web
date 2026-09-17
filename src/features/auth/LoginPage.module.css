@@ -6,3 +6,17 @@
   color: var(--mantine-primary-color-6);
   font-weight: 500;
 }
+.panel {
+  background: linear-gradient(
+    160deg,
+    var(--mantine-color-navy-6) 0%,
+    var(--mantine-color-navy-9) 100%
+  );
+  color: var(--mantine-color-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical */
+  align-items: center; /* horizontal */
+  text-align: center; /* el texto adentro */
+  padding: var(--mantine-spacing-xl);
+}

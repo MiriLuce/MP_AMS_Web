@@ -2,6 +2,7 @@ import { AppShell, Burger, Group, NavLink, Title, ThemeIcon } from '@mantine/cor
 import { useMatch, NavLink as RouterNavLink, Outlet } from 'react-router'
 import { useDisclosure } from '@mantine/hooks'
 import { IconCalendar, IconHome, IconUsers, type TablerIcon } from '@tabler/icons-react'
+import AccountMenu from '@/core/layout/AccountMenu'
 
 function NavLinkItem({
   to,
@@ -47,7 +48,7 @@ function AppLayout() {
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md">
+        <Group h="100%" px="md" justify="space-between">
           <Burger
             opened={mobileNavBarOpened}
             onClick={toggleMobileNavBar}
@@ -60,7 +61,13 @@ function AppLayout() {
             size="sm"
             visibleFrom="sm"
           />
-          <Title order={3}>Colegios y Academia Max Planck</Title>
+          <Title visibleFrom="sm" order={3}>
+            Colegios y Academia Max Planck
+          </Title>
+          <Title hiddenFrom="sm" order={3}>
+            Max Planck
+          </Title>
+          <AccountMenu />
         </Group>
       </AppShell.Header>
       <AppShell.Navbar>
