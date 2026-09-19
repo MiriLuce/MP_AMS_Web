@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { jwtDecode } from 'jwt-decode'
 
+import { queryClient } from '@/core/api/queryClient'
+
 type AuthState = {
   token: string
   expiresAt: number
@@ -85,6 +87,18 @@ export const useSessionStore = create<SessionStore>((set) => ({
   },
   endSession: () => {
     set({ authState: null })
+    // La caché de react-query es un sistema aparte: dejar `authState` en null no la toca, y sin
+    // esto el próximo usuario de esta pestaña ve los datos del anterior.
+    //
+    // Va aquí y no en el `onClick` del menú porque hay **tres** salidas de sesión — el menú de
+    // cuenta, el botón de `UnlockScreen` y el interceptor del 401 en `client.ts` — y la del
+    // interceptor corre fuera de React, donde `useQueryClient()` no existe. Repartida entre los
+    // call sites, la salida que más importa (la que ocurre sola, sin que nadie mire) sería la
+    // única que no la hace.
+    //
+    // El orden importa: primero `set`, para que las guardas desmonten lo que esté consultando, y
+    // recién después `clear()`.
+    queryClient.clear()
   },
   lockSession: () => {
     set((state) => ({
