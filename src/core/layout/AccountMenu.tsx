@@ -33,10 +33,6 @@ function AccountMenu() {
           </Stack>
         </Menu.Label>
         <Menu.Divider />
-        {/* `component={Link}` va en el `Menu.Item`, que es el elemento clickeable: esto navega a
-            otra URL, así que tiene que ser un `<a href>` de verdad — ctrl+clic, clic del medio y
-            “abrir en pestaña nueva” funcionan, y el navegador muestra el destino. `Link` navega
-            del lado del cliente, sin recargar. “Cerrar sesión” sí es una acción: se queda botón. */}
         <Menu.Item
           component={Link}
           to="/change-password"
