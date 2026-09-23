@@ -157,7 +157,7 @@ Follow them. These are the ones this codebase has already paid for:
 
 **Comments**
 
-Write why, not what. The comments worth keeping in this repo are the ones recording a trap already stepped on: they are the reason the same bug has not appeared a third time.
+Comments are the exception. Do not explain what the code already says, and do not justify a decision in a comment — if the code exists, it was decided; the reasoning lives in `specs/` (ADRs, feature `design.md`). Do not restore comments the owner removed. When a decision is invisible and a well-meant change could break it (e.g. `UnlockScreen` shows `displayName` and never the document, `ADR-004`), protect it with a test that fails when it is broken, not with a comment. Traps with a library or tool are recorded in the section below, not in the code.
 
 ## Traps already stepped on
 
