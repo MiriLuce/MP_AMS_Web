@@ -1,5 +1,5 @@
 import { Avatar, Menu, Stack, UnstyledButton, Text, Group } from '@mantine/core'
-import { IconPasswordUser, IconLogout } from '@tabler/icons-react'
+import { IconUser, IconPasswordUser, IconLogout } from '@tabler/icons-react'
 import { useSessionStore } from '@/core/session/store'
 import { Link } from 'react-router'
 
@@ -33,6 +33,9 @@ function AccountMenu() {
           </Stack>
         </Menu.Label>
         <Menu.Divider />
+        <Menu.Item component={Link} to="/my-account" leftSection={<IconUser size={14} />}>
+          Mi datos
+        </Menu.Item>
         <Menu.Item
           component={Link}
           to="/change-password"

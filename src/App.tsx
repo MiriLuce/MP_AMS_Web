@@ -12,6 +12,7 @@ import NotFoundPage from '@/core/routing/NotFoundPage'
 import LoginPage from '@/features/auth/LoginPage'
 import ChangePasswordPage from '@/features/auth/ChangePasswordPage'
 import SetPasswordPage from '@/features/auth/SetPasswordPage'
+import MyAccountPage from './features/account/MyAccountPage'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/" element={<Title>Inicio</Title>} />
               <Route path="/change-password" element={<ChangePasswordPage />} />
+              <Route path="/my-account" element={<MyAccountPage />} />
               <Route element={<RequirePermission permission="EM:AcademicYear.Manage" />}>
                 <Route path="/academic-years" element={<Title>Años Escolares</Title>} />
               </Route>

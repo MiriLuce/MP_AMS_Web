@@ -43,14 +43,8 @@ function UnlockScreen() {
     loginMutation.mutate({ userName: authState.userName, password: values.password })
   }
 
-  // Desbloquear **reautentica** (decision A2 del 9-sep): manda un `login`, no un cambio de
-  // contraseña. Así que la contraseña que el backend acepta es la vigente — y si la compuerta
-  // forzada sigue abierta, la vigente es todavía la temporal, porque el cambio nunca se completó.
-  // El caso es el más probable de todos: alguien entra por primera vez, ve que le piden cambiarla,
-  // se va a averiguar cuál poner, y vuelve pasado el límite de inactividad.
-  //
-  // Ojo con no confundir esta pantalla con `SetPasswordPage`, que está justo debajo del modal y
-  // sí pide una contraseña **nueva**. Son dos formularios superpuestos con destinos distintos.
+  // Desbloquear **reautentica** manda un `login`, no un cambio de contraseña.
+  // Así que la contraseña que el backend acepta es la vigente
   const isTemporaryPassword = authState.mustChangePassword
 
   return (
@@ -62,23 +56,22 @@ function UnlockScreen() {
         <Title order={3} ta="center" className={classes.title}>
           Sesión bloqueada
         </Title>
-        {/* Solo el nombre, nunca el documento (ADR-004): esta pantalla queda a la vista sobre un
-            escritorio desatendido. El desplegable del menú sí lo muestra, porque hace falta un
-            clic deliberado de quien ya tiene la sesión. Distinto riesgo, distinta regla. */}
         <Text fw={500} ta="center">
           {authState.displayName}
         </Text>
         <Text c="dimmed" size="sm" ta="center">
-          Se bloqueó automáticamente por superar el límite de inactividad.{' '}
-          {isTemporaryPassword ? (
-            'Ingresa tu contraseña temporal para continuar.'
-          ) : (
-            <>
-              Ingresa tu contraseña para volver a{' '}
-              <span className={classes.highlight}>Colegios y Academia Max Planck</span>
-            </>
-          )}
+          Se bloqueó automáticamente por superar el límite de inactividad.
         </Text>
+        {isTemporaryPassword ? (
+          <Text c="dimmed" size="sm" ta="center">
+            Ingresa tu contraseña temporal para continuar.
+          </Text>
+        ) : (
+          <Text c="dimmed" size="sm" ta="center">
+            Ingresa tu contraseña para volver a{' '}
+            <span className={classes.highlight}>Colegios y Academia Max Planck</span>
+          </Text>
+        )}
       </Stack>
 
       <form noValidate onSubmit={form.onSubmit(handleSubmit)}>
