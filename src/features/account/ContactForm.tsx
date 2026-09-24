@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   departmentsQueryOptions,
   districtsQueryOptions,
+  phoneTypesQueryOptions,
   provincesQueryOptions,
 } from '@/core/api/catalogs/queries'
 import type { ApiError } from '@/core/api/errors'
@@ -11,6 +12,7 @@ import ApiErrorAlert from '@/shared/ApiErrorAlert'
 import { validateEmail } from '@/shared/emailRule'
 import AccountBlock from './AccountBlock'
 import FieldGrid from './FieldGrid'
+import PhoneFields from './PhoneFields'
 import { updateMe } from './api'
 import {
   findUbigeo,
@@ -35,6 +37,19 @@ function ContactForm({ person, onDone }: Props) {
         values.departmentId !== null && value === null
           ? 'Completa la ubicación hasta el distrito, o deja vacío el departamento.'
           : null,
+      phones: {
+        phoneTypeId: (value) => (value ? null : 'El tipo de teléfono es obligatorio.'),
+        number: (value) =>
+          !value.trim()
+            ? 'El número de teléfono es obligatorio.'
+            : value.trim().length > 25
+              ? 'El número de teléfono no puede exceder 25 caracteres.'
+              : null,
+        description: (value) =>
+          value.trim().length > 200
+            ? 'La descripción del teléfono no puede exceder 200 caracteres.'
+            : null,
+      },
     },
   })
 
@@ -48,6 +63,7 @@ function ContactForm({ person, onDone }: Props) {
     ...districtsQueryOptions(Number(departmentId), Number(provinceId)),
     enabled: departmentId !== null && provinceId !== null,
   })
+  const phoneTypesQuery = useQuery(phoneTypesQueryOptions)
   const isResolvingLocation = districtId !== null && districtsQuery.isPending
 
   const updateMutation = useMutation<MeResponse, ApiError, UpdateMyContactInfoRequest>({
@@ -71,7 +87,8 @@ function ContactForm({ person, onDone }: Props) {
     ((saveError.kind === 'validation' && !toFormErrors(saveError.errors).hasUnmappedErrors) ||
       saveError.code === 'PM_DISTRICT_NOT_FOUND')
 
-  const catalogError = departmentsQuery.error ?? provincesQuery.error ?? districtsQuery.error
+  const catalogError =
+    departmentsQuery.error ?? provincesQuery.error ?? districtsQuery.error ?? phoneTypesQuery.error
 
   const handleDepartmentChange = (value: string | null) => {
     form.setValues({ departmentId: value, provinceId: null, districtId: null })
@@ -135,6 +152,7 @@ function ContactForm({ person, onDone }: Props) {
             <TextInput label="Dirección" {...form.getInputProps('address')} />
             <TextInput label="Referencia" {...form.getInputProps('addressReference')} />
           </FieldGrid>
+          <PhoneFields form={form} phoneTypes={phoneTypesQuery.data} />
           <Group justify="flex-end">
             <Button variant="default" onClick={onDone} disabled={updateMutation.isPending}>
               Cancelar

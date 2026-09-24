@@ -32,16 +32,49 @@ export function toContactFormValues(person: PersonResponse): ContactFormValues {
     departmentId: location ? String(location.department.id) : null,
     provinceId: location ? String(location.province.id) : null,
     districtId: location ? String(location.district.id) : null,
-    phones: person.phones.map((phone) => ({
-      key: randomId(),
-      phoneId: phone.phoneId,
-      phoneTypeId: String(phone.phoneType.id),
-      number: phone.number,
-      description: phone.description ?? '',
-      isMain: phone.isMain,
-      isActive: phone.isActive,
-    })),
+    phones: ensureOneMain(
+      person.phones.map((phone) => ({
+        key: randomId(),
+        phoneId: phone.phoneId,
+        phoneTypeId: String(phone.phoneType.id),
+        number: phone.number,
+        description: phone.description ?? '',
+        isMain: phone.isMain,
+        isActive: phone.isActive,
+      })),
+    ),
   }
+}
+
+export function setMainPhone(phones: PhoneFormValue[], key: string): PhoneFormValue[] {
+  return phones.map((phone) => (phone.isActive ? { ...phone, isMain: phone.key === key } : phone))
+}
+
+export function ensureOneMain(phones: PhoneFormValue[]): PhoneFormValue[] {
+  const active = phones.filter((phone) => phone.isActive)
+  if (active.length === 0 || active.filter((phone) => phone.isMain).length === 1) return phones
+  const mainKey = active.find((phone) => phone.isMain)?.key ?? active[0].key
+  return setMainPhone(phones, mainKey)
+}
+
+export function addPhone(phones: PhoneFormValue[]): PhoneFormValue[] {
+  const isFirstActive = !phones.some((phone) => phone.isActive)
+  return [
+    ...phones,
+    {
+      key: randomId(),
+      phoneId: null,
+      phoneTypeId: null,
+      number: '',
+      description: '',
+      isMain: isFirstActive,
+      isActive: true,
+    },
+  ]
+}
+
+export function removePhone(phones: PhoneFormValue[], key: string): PhoneFormValue[] {
+  return ensureOneMain(phones.filter((phone) => phone.key !== key))
 }
 
 export function findUbigeo(
