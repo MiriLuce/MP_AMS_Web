@@ -31,6 +31,16 @@ export function toApiError(error: unknown): ApiError {
     }
   }
 
+  const data: unknown = error.response.data
+  if (typeof data === 'string' && data.trim() !== '') {
+    return {
+      kind: 'unknown',
+      code: 'UNEXPECTED_ERROR',
+      message: 'El servidor no está disponible en este momento. Inténtalo más tarde.',
+      traceId: '',
+    }
+  }
+
   const body: ProblemDetailsBody = error.response.data ?? {}
   const traceId = body.traceId ?? ''
 
