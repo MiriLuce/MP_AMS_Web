@@ -1,9 +1,19 @@
 import { QueryClient } from '@tanstack/react-query'
 
-// Una sola instancia, a nivel de módulo y fuera de React. Dos razones, y la segunda es la que
-// obligó a sacarla de `main.tsx`:
-//   1. La caché tiene que sobrevivir a los re-renders. Creada dentro de un componente se perdería
-//      entera en cada uno.
-//   2. Hay que alcanzarla desde lugares que no son componentes —`endSession()` en el store y el
-//      interceptor del 401 en `client.ts`—, donde `useQueryClient()` no se puede llamar.
-export const queryClient = new QueryClient()
+const RETRY_TIMES = 3
+const STALE_TIME = 5 * 60 * 1000
+
+function shouldRetry(failureCount: number, error: Error): boolean {
+  if (!('kind' in error)) return false
+  if (error.kind === 'network' || error.kind === 'unknown') return failureCount < RETRY_TIMES
+  return false
+}
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: shouldRetry,
+      staleTime: STALE_TIME,
+    },
+  },
+})
