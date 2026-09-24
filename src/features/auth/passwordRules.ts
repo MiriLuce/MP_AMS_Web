@@ -1,32 +1,22 @@
-// Espeja `ChangePasswordRequestValidator` del backend, regla por regla y con sus mismos textos.
-// Vive acá y no en cada pantalla porque hay dos formularios que definen contraseña (el forzado con
-// contraseña temporal y el voluntario): escrita dos veces, la próxima vez que el backend cambie una
-// regla se va a actualizar una sola copia, y el síntoma sería un 400 que la pantalla no supo prever.
-//
-// Regla de fondo: el backend define qué es válido; esto solo lo refleja. Una regla más estricta acá
-// no falla del lado seguro — rechaza una contraseña que el servidor habría aceptado.
-
 export const MIN_PASSWORD_LENGTH = 8
 
 const HAS_UPPERCASE = /[A-Z]/
 const HAS_LOWERCASE = /[a-z]/
 const HAS_DIGIT = /[0-9]/
-// El backend pide `[^a-zA-Z0-9]`: cualquier cosa que no sea letra ASCII ni dígito. Una lista cerrada
-// de símbolos dejaría afuera contraseñas válidas con `-`, `_`, `=`, `/` o un espacio.
-const HAS_SPECIAL = /[^a-zA-Z0-9]/
+const IS_ASCII_LETTER_OR_DIGIT = /[A-Za-z0-9]/
+
+const SPECIAL_CHARACTERS = '!@#$%&*-_.?'
+const SPECIAL_CHARACTERS_DISPLAY = [...SPECIAL_CHARACTERS].join(' ')
 
 export const PASSWORD_REQUIREMENTS = [
   `Al menos ${MIN_PASSWORD_LENGTH} caracteres`,
   'Una letra mayúscula y una minúscula',
   'Al menos un dígito',
-  'Al menos un carácter que no sea letra ni dígito (por ejemplo: ! @ # $ % & * - _)',
+  `Al menos uno de estos caracteres especiales: ${SPECIAL_CHARACTERS_DISPLAY}`,
+  'Solo letras sin tildes ni ñ, dígitos y esos caracteres especiales (sin espacios)',
   'Distinta de tu contraseña actual',
 ]
 
-/**
- * `currentPassword` en `null` significa que no se conoce en esta pantalla, y entonces la regla
- * "distinta de la actual" la aplica el backend (422). No se inventa un valor para compararla.
- */
 export function validateNewPassword(value: string, currentPassword: string | null): string | null {
   if (!value.trim()) {
     return 'La nueva contraseña es obligatoria.'
@@ -43,8 +33,15 @@ export function validateNewPassword(value: string, currentPassword: string | nul
   if (!HAS_DIGIT.test(value)) {
     return 'La nueva contraseña debe contener al menos un dígito.'
   }
-  if (!HAS_SPECIAL.test(value)) {
-    return 'La nueva contraseña debe contener al menos un carácter especial.'
+  if (![...value].some((char) => SPECIAL_CHARACTERS.includes(char))) {
+    return `La nueva contraseña debe contener al menos uno de estos caracteres especiales: ${SPECIAL_CHARACTERS_DISPLAY}`
+  }
+  if (
+    ![...value].every(
+      (char) => IS_ASCII_LETTER_OR_DIGIT.test(char) || SPECIAL_CHARACTERS.includes(char),
+    )
+  ) {
+    return `La nueva contraseña solo puede contener letras sin tildes ni ñ, dígitos y estos caracteres especiales: ${SPECIAL_CHARACTERS_DISPLAY}`
   }
   if (currentPassword !== null && value === currentPassword) {
     return 'La nueva contraseña debe ser distinta de la actual.'
