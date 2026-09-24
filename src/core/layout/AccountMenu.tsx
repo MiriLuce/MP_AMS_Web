@@ -34,7 +34,7 @@ function AccountMenu() {
         </Menu.Label>
         <Menu.Divider />
         <Menu.Item component={Link} to="/my-account" leftSection={<IconUser size={14} />}>
-          Mi datos
+          Mis datos
         </Menu.Item>
         <Menu.Item
           component={Link}
