@@ -6,8 +6,6 @@ import { useEffect, useRef } from 'react'
 
 const LIMIT_INACTIVITY_TIME = 15 * 60 * 1000
 
-// Deliberadamente NO están `visibilitychange` ni el `focus` de la ventana: volver a la pestaña
-// después de veinte minutos afuera es justo cuando el bloqueo tiene que estar puesto.
 const ACTIVITY_EVENTS = [
   'mousemove',
   'mousedown',
@@ -15,6 +13,8 @@ const ACTIVITY_EVENTS = [
   'scroll',
   'touchstart',
   'popstate', // navegación con el botón atrás/adelante del navegador
+  'visibilitychange',
+  'focus',
 ] as const
 
 function InactivityLock() {
@@ -24,17 +24,24 @@ function InactivityLock() {
   const lastActivityAt = useRef<number | null>(null)
 
   useEffect(() => {
+    const hasExpired = () =>
+      lastActivityAt.current !== null && Date.now() - lastActivityAt.current > LIMIT_INACTIVITY_TIME
+
     const markActivity = () => {
+      if (hasExpired()) {
+        lockSession()
+        return
+      }
       lastActivityAt.current = Date.now()
     }
-    markActivity()
+    lastActivityAt.current = Date.now()
 
     ACTIVITY_EVENTS.forEach((event) => {
       window.addEventListener(event, markActivity, { passive: true })
     })
 
     const intervalId = window.setInterval(() => {
-      if (lastActivityAt.current && Date.now() - lastActivityAt.current > LIMIT_INACTIVITY_TIME) {
+      if (hasExpired()) {
         lockSession()
       }
     }, 20_000)
