@@ -4,7 +4,7 @@ import { useSessionStore } from '@/core/session/store'
 
 export const apiClient = axios.create({
   baseURL: '/api',
-  timeout: 10000, // Set a timeout of 10 seconds
+  timeout: 5 * 1000,
   headers: { 'Content-Type': 'application/json' },
 })
 

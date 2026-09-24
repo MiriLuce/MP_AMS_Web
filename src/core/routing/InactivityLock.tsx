@@ -19,20 +19,36 @@ const ACTIVITY_EVENTS = [
 
 function InactivityLock() {
   const lockSession = useSessionStore((state) => state.lockSession)
+  const endSession = useSessionStore((state) => state.endSession)
   const isLocked = useSessionStore((state) => state.authState?.isLocked ?? false)
 
   const lastActivityAt = useRef<number | null>(null)
 
   useEffect(() => {
-    const hasExpired = () =>
+    const isTokenExpired = () => {
+      const expiresAt = useSessionStore.getState().authState?.expiresAt
+      return expiresAt !== undefined && Date.now() >= expiresAt
+    }
+
+    const isInactive = () =>
       lastActivityAt.current !== null && Date.now() - lastActivityAt.current > LIMIT_INACTIVITY_TIME
 
-    const markActivity = () => {
-      if (hasExpired()) {
-        lockSession()
-        return
+    const checkSession = () => {
+      if (isTokenExpired()) {
+        endSession()
+        return false
       }
-      lastActivityAt.current = Date.now()
+      if (isInactive()) {
+        lockSession()
+        return false
+      }
+      return true
+    }
+
+    const markActivity = () => {
+      if (checkSession()) {
+        lastActivityAt.current = Date.now()
+      }
     }
     lastActivityAt.current = Date.now()
 
@@ -40,11 +56,7 @@ function InactivityLock() {
       window.addEventListener(event, markActivity, { passive: true })
     })
 
-    const intervalId = window.setInterval(() => {
-      if (hasExpired()) {
-        lockSession()
-      }
-    }, 20_000)
+    const intervalId = window.setInterval(checkSession, 20_000)
 
     return () => {
       ACTIVITY_EVENTS.forEach((event) => {
@@ -52,7 +64,7 @@ function InactivityLock() {
       })
       clearInterval(intervalId)
     }
-  }, [lockSession, isLocked])
+  }, [lockSession, endSession, isLocked])
 
   return (
     <>
