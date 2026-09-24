@@ -1,22 +1,30 @@
-import { Container, Loader, Text, Title, Paper } from '@mantine/core'
+import { Container, Loader, Stack, Title } from '@mantine/core'
 import { useQuery } from '@tanstack/react-query'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
+import ContactBlock from './ContactBlock'
+import EmploymentBlock from './EmploymentBlock'
+import IdentityBlock from './IdentityBlock'
 import { meQueryOptions } from './queries'
 
 function MyAccountPage() {
   const { data, isError, error, isPending } = useQuery(meQueryOptions)
 
   return (
-    <Container m="30">
-      <Title order={2} ta="center">
-        Mis datos
-      </Title>
-      <Paper withBorder shadow="sm" p="xl">
+    <Container size="md" py="xl">
+      <Stack gap="lg">
+        <Title order={2}>Mis datos</Title>
         {isPending && <Loader />}
         {isError && <ApiErrorAlert error={error} />}
-        {data && <Text>{data.person.firstName}</Text>}
-      </Paper>
+        {data && (
+          <>
+            <IdentityBlock person={data.person} />
+            <EmploymentBlock employment={data.employment} roles={data.roles} />
+            <ContactBlock person={data.person} />
+          </>
+        )}
+      </Stack>
     </Container>
   )
 }
+
 export default MyAccountPage
