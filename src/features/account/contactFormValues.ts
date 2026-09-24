@@ -33,15 +33,17 @@ export function toContactFormValues(person: PersonResponse): ContactFormValues {
     provinceId: location ? String(location.province.id) : null,
     districtId: location ? String(location.district.id) : null,
     phones: ensureOneMain(
-      person.phones.map((phone) => ({
-        key: randomId(),
-        phoneId: phone.phoneId,
-        phoneTypeId: String(phone.phoneType.id),
-        number: phone.number,
-        description: phone.description ?? '',
-        isMain: phone.isMain,
-        isActive: phone.isActive,
-      })),
+      person.phones
+        .toSorted((a, b) => Number(b.isMain) - Number(a.isMain))
+        .map((phone) => ({
+          key: randomId(),
+          phoneId: phone.phoneId,
+          phoneTypeId: String(phone.phoneType.id),
+          number: phone.number,
+          description: phone.description ?? '',
+          isMain: phone.isMain,
+          isActive: phone.isActive,
+        })),
     ),
   }
 }
@@ -112,14 +114,16 @@ const FIELD_ALIASES: Record<string, string> = { residentUbigeo: 'districtId' }
 const FORM_FIELDS =
   /^(email|address|addressReference|districtId|phones\.\d+\.(phoneTypeId|number|description))$/
 
-export function toFormErrors(errors: Record<string, string[]>) {
+export function toFormErrors(errors: Record<string, string[]>, values: ContactFormValues) {
   const fieldErrors: Record<string, string> = {}
   let hasUnmappedErrors = false
 
   for (const [key, messages] of Object.entries(errors)) {
     const path = key.replace(/\[(\d+)\]/g, '.$1')
     const field = FIELD_ALIASES[path] ?? path
-    if (FORM_FIELDS.test(field)) {
+    const phoneIndex = /^phones\.(\d+)\./.exec(field)?.[1]
+    const isHiddenPhone = phoneIndex !== undefined && !values.phones[Number(phoneIndex)]?.isActive
+    if (FORM_FIELDS.test(field) && !isHiddenPhone) {
       fieldErrors[field] = messages[0]
     } else {
       hasUnmappedErrors = true

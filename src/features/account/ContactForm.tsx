@@ -10,6 +10,7 @@ import {
 import type { ApiError } from '@/core/api/errors'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
 import { validateEmail } from '@/shared/emailRule'
+import { validatePhoneNumber } from '@/shared/phoneRule'
 import AccountBlock from './AccountBlock'
 import FieldGrid from './FieldGrid'
 import PhoneFields from './PhoneFields'
@@ -39,12 +40,7 @@ function ContactForm({ person, onDone }: Props) {
           : null,
       phones: {
         phoneTypeId: (value) => (value ? null : 'El tipo de teléfono es obligatorio.'),
-        number: (value) =>
-          !value.trim()
-            ? 'El número de teléfono es obligatorio.'
-            : value.trim().length > 25
-              ? 'El número de teléfono no puede exceder 25 caracteres.'
-              : null,
+        number: validatePhoneNumber,
         description: (value) =>
           value.trim().length > 200
             ? 'La descripción del teléfono no puede exceder 200 caracteres.'
@@ -74,7 +70,7 @@ function ContactForm({ person, onDone }: Props) {
     },
     onError: (error) => {
       if (error.kind === 'validation') {
-        form.setErrors(toFormErrors(error.errors).fieldErrors)
+        form.setErrors(toFormErrors(error.errors, form.values).fieldErrors)
       } else if (error.code === 'PM_DISTRICT_NOT_FOUND') {
         form.setFieldError('districtId', error.message)
       }
@@ -84,7 +80,8 @@ function ContactForm({ person, onDone }: Props) {
   const saveError = updateMutation.error
   const isShownOnFields =
     saveError !== null &&
-    ((saveError.kind === 'validation' && !toFormErrors(saveError.errors).hasUnmappedErrors) ||
+    ((saveError.kind === 'validation' &&
+      !toFormErrors(saveError.errors, form.values).hasUnmappedErrors) ||
       saveError.code === 'PM_DISTRICT_NOT_FOUND')
 
   const catalogError =

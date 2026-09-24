@@ -2,6 +2,7 @@ import { ActionIcon, Button, Group, Radio, Select, Stack, Text, TextInput } from
 import type { UseFormReturnType } from '@mantine/form'
 import { IconPlus, IconTrash } from '@tabler/icons-react'
 import type { PhoneTypeResponse } from '@/core/api/catalogs/types'
+import { formatPhoneNumber } from '@/shared/phoneRule'
 import {
   addPhone,
   removePhone,
@@ -60,6 +61,9 @@ function PhoneFields({ form, phoneTypes }: Props) {
                     label="Número"
                     w={170}
                     {...form.getInputProps(`phones.${index}.number`)}
+                    onBlur={() =>
+                      form.setFieldValue(`phones.${index}.number`, formatPhoneNumber(phone.number))
+                    }
                   />
                   <TextInput
                     label="Descripción"

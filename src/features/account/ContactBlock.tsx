@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Badge, Button, Group, Stack, Text } from '@mantine/core'
 import { IconPencil } from '@tabler/icons-react'
+import { formatPhoneNumber } from '@/shared/phoneRule'
 import AccountBlock from './AccountBlock'
 import ContactForm from './ContactForm'
 import FieldGrid from './FieldGrid'
@@ -17,7 +18,9 @@ function ContactBlock({ person }: Props) {
   }
 
   const location = person.residentLocation
-  const activePhones = person.phones.filter((phone) => phone.isActive)
+  const activePhones = person.phones
+    .filter((phone) => phone.isActive)
+    .toSorted((a, b) => Number(b.isMain) - Number(a.isMain))
 
   return (
     <AccountBlock
@@ -42,7 +45,7 @@ function ContactBlock({ person }: Props) {
               <Stack gap={4}>
                 {activePhones.map((phone) => (
                   <Group key={phone.phoneId} gap="xs">
-                    <Text>{phone.number}</Text>
+                    <Text>{formatPhoneNumber(phone.number)}</Text>
                     <Text size="sm" c="dimmed">
                       {phone.description
                         ? `${phone.phoneType.displayName} · ${phone.description}`
