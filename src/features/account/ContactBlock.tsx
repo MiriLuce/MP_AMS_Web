@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Badge, Button, Group, Stack, Text } from '@mantine/core'
+import { Badge, Button, Table, Text } from '@mantine/core'
 import { IconPencil } from '@tabler/icons-react'
 import { formatPhoneNumber } from '@/shared/phoneRule'
 import AccountBlock from './AccountBlock'
@@ -38,41 +38,59 @@ function ContactBlock({ person }: Props) {
     >
       <FieldGrid>
         <Field label="Correo electrónico" value={person.email} />
-        <Field
-          label="Teléfonos"
-          value={
-            activePhones.length > 0 ? (
-              <Stack gap={4}>
-                {activePhones.map((phone) => (
-                  <Group key={phone.phoneId} gap="xs">
-                    <Text>{formatPhoneNumber(phone.number)}</Text>
-                    <Text size="sm" c="dimmed">
-                      {phone.description
-                        ? `${phone.phoneType.displayName} · ${phone.description}`
-                        : phone.phoneType.displayName}
-                    </Text>
-                    {phone.isMain && (
-                      <Badge size="sm" variant="light">
-                        Principal
-                      </Badge>
-                    )}
-                  </Group>
-                ))}
-              </Stack>
-            ) : null
-          }
-        />
         {location && (
           <>
-            <Field label="Dirección" value={location.address} />
-            <Field label="Referencia" value={location.addressReference} />
             <Field
               label="Ubicación"
               value={`${location.district.displayName}, ${location.province.displayName}, ${location.department.displayName}`}
             />
+            <Field label="Dirección" value={location.address} />
+            <Field label="Referencia" value={location.addressReference} />
           </>
         )}
       </FieldGrid>
+      <Field
+        label="Teléfonos"
+        value={
+          activePhones.length > 0 ? (
+            <Table.ScrollContainer minWidth={420} type="native">
+              <Table
+                w="auto"
+                withRowBorders={false}
+                verticalSpacing={4}
+                styles={{ td: { paddingLeft: 0, paddingRight: 'var(--mantine-spacing-xl)' } }}
+              >
+                <Table.Tbody>
+                  {activePhones.map((phone) => (
+                    <Table.Tr key={phone.phoneId}>
+                      <Table.Td>
+                        <Text>{formatPhoneNumber(phone.number)}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm" c="dimmed">
+                          {phone.phoneType.displayName}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm" c="dimmed">
+                          {phone.description}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        {phone.isMain && (
+                          <Badge size="sm" variant="light">
+                            Principal
+                          </Badge>
+                        )}
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+          ) : null
+        }
+      />
     </AccountBlock>
   )
 }
