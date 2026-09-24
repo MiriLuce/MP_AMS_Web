@@ -68,3 +68,20 @@ export type MeResponse = {
   employment: MeEmploymentResponse | null
   person: PersonResponse
 }
+
+export type UpdatePersonPhoneRequest = {
+  phoneId: number | null
+  phoneTypeId: number
+  number: string
+  isMain: boolean
+  description: string | null
+  isActive: boolean
+}
+
+export type UpdateMyContactInfoRequest = {
+  email: string | null
+  residentUbigeo: string | null
+  address: string | null
+  addressReference: string | null
+  phones: UpdatePersonPhoneRequest[]
+}
