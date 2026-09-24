@@ -1,5 +1,6 @@
 import { formatDate } from '@/shared/formatDate'
 import AccountBlock from './AccountBlock'
+import FieldGrid from './FieldGrid'
 import Field from './Field'
 import type { PersonResponse } from './types'
 
@@ -17,14 +18,16 @@ function IdentityBlock({ person }: Props) {
 
   return (
     <AccountBlock title="Identidad">
-      <Field label="Nombre completo" value={fullName} />
-      <Field
-        label="Documento de identidad"
-        value={`${person.typeDocument.displayName} ${person.documentIdentity}`}
-      />
-      <Field label="Género" value={person.gender?.displayName} />
-      <Field label="Fecha de nacimiento" value={formatDate(person.birthDate)} />
-      <Field label="País de nacimiento" value={person.birthCountry.displayName} />
+      <FieldGrid>
+        <Field label="Nombre completo" value={fullName} />
+        <Field
+          label="Documento de identidad"
+          value={`${person.typeDocument.displayName} ${person.documentIdentity}`}
+        />
+        <Field label="Género" value={person.gender?.displayName} />
+        <Field label="Fecha de nacimiento" value={formatDate(person.birthDate)} />
+        <Field label="País de nacimiento" value={person.birthCountry.displayName} />
+      </FieldGrid>
     </AccountBlock>
   )
 }

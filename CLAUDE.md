@@ -178,6 +178,7 @@ Mantine 9 specifics:
 - **A Mantine `NavLink`'s `children` are not its text** — they are nested items. The text is `label`. `<NavLink>Inicio</NavLink>` renders an unlabelled item with loose text and no padding, and looks like "Mantine without styles".
 - **`active` is a boolean you control.** Mantine knows nothing about routes. Bridge with `useMatch({ path: to, end: to === '/' })` — **with `end`**, or `/academic-years/2027` switches the "Años Escolares" item off. The root exception is mandatory: without it `/` matches everything.
 - `AppShell` infers no measurements: `header={{ height }}` and `navbar={{ width, breakpoint }}` are required, and `padding` goes on the `AppShell`, not on `Main`.
+- **A form whose fields drive other fields uses `mode: 'controlled'`** (e.g. department → province → district in `ContactForm`): the dependent query needs a re-render when the value changes, and uncontrolled mode does not give one. Plain forms stay uncontrolled.
 - **`useForm` in `uncontrolled` mode does not re-render on typing**, so `form.values` read inside a validator points at the previous render's object. A rule that depends on another field reads it from the validator's second parameter, `(value, values)`, which holds the live values.
 
 Tooling:
@@ -185,6 +186,7 @@ Tooling:
 - `__dirname` does not exist in an ESM `vite.config.ts` under Vite 8 — use `import.meta.dirname`.
 - `tsconfig.app.json` has **no `baseUrl`**: TypeScript 6 makes it an error, and since TS 5 `paths` resolves relative to the tsconfig itself, so `"@/*": ["./src/*"]` works without it.
 - A `Cannot find module` about something named in a config almost always means the package is not installed, not that the file is misspelled.
+- **Two files whose names differ only in casing** (`contactForm.ts` next to `ContactForm.tsx`) collide on Windows: `tsc` reports `TS1261 … differs only in casing` and the import resolves to the wrong one. Name the logic module after what it holds (`contactFormValues.ts`).
 - `@mantine/core/styles.css` is imported **before** `./index.css`, so local styles can override Mantine's.
 - `@fontsource-variable/*` packages register the family with a **`Variable` suffix** (`'Inter Variable'`). Without it the browser silently falls back to the system font.
 
