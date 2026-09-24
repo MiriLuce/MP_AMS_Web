@@ -16,10 +16,7 @@ function IdentityBlock({ person }: Props) {
     .join(' ')
 
   return (
-    <AccountBlock
-      title="Identidad"
-      managedBy="Tu nombre, documento y datos de nacimiento los administra la institución."
-    >
+    <AccountBlock title="Identidad">
       <Field label="Nombre completo" value={fullName} />
       <Field
         label="Documento de identidad"

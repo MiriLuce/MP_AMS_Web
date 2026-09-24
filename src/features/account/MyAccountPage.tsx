@@ -1,4 +1,4 @@
-import { Container, Loader, Stack, Title } from '@mantine/core'
+import { Center, Container, Loader, Stack, Title } from '@mantine/core'
 import { useQuery } from '@tanstack/react-query'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
 import ContactBlock from './ContactBlock'
@@ -12,8 +12,14 @@ function MyAccountPage() {
   return (
     <Container size="md" py="xl">
       <Stack gap="lg">
-        <Title order={2}>Mis datos</Title>
-        {isPending && <Loader />}
+        <Title order={2} mb="md">
+          Mis datos
+        </Title>
+        {isPending && (
+          <Center py="xl">
+            <Loader />
+          </Center>
+        )}
         {isError && <ApiErrorAlert error={error} />}
         {data && (
           <>

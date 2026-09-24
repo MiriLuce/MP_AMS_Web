@@ -8,7 +8,7 @@ type Props = { employment: MeEmploymentResponse | null; roles: string[] }
 
 function EmploymentBlock({ employment, roles }: Props) {
   return (
-    <AccountBlock title="Empleo" managedBy="Tu cargo y estado los administra Recursos Humanos.">
+    <AccountBlock title="Empleo">
       {employment ? (
         <>
           <Field label="Cargo en la institución" value={employment.jobTitle.displayName} />
