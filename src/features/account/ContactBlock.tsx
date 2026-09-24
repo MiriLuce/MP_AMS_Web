@@ -38,16 +38,15 @@ function ContactBlock({ person }: Props) {
     >
       <FieldGrid>
         <Field label="Correo electrónico" value={person.email} />
-        {location && (
-          <>
-            <Field
-              label="Ubicación"
-              value={`${location.district.displayName}, ${location.province.displayName}, ${location.department.displayName}`}
-            />
-            <Field label="Dirección" value={location.address} />
-            <Field label="Referencia" value={location.addressReference} />
-          </>
-        )}
+        <Field
+          label="Ubicación"
+          value={
+            location &&
+            `${location.district.displayName}, ${location.province.displayName}, ${location.department.displayName}`
+          }
+        />
+        <Field label="Dirección" value={person.address} />
+        <Field label="Referencia" value={person.addressReference} />
       </FieldGrid>
       <Field
         label="Teléfonos"

@@ -27,8 +27,8 @@ export function toContactFormValues(person: PersonResponse): ContactFormValues {
 
   return {
     email: person.email ?? '',
-    address: location?.address ?? '',
-    addressReference: location?.addressReference ?? '',
+    address: person.address ?? '',
+    addressReference: person.addressReference ?? '',
     departmentId: location ? String(location.department.id) : null,
     provinceId: location ? String(location.province.id) : null,
     districtId: location ? String(location.district.id) : null,

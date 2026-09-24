@@ -26,8 +26,6 @@ export type PersonResidentLocationResponse = {
   department: DepartmentLookup
   province: ProvinceLookup
   district: DistrictLookup
-  address: string | null
-  addressReference: string | null
 }
 
 export type PersonPhoneResponse = {
@@ -50,6 +48,8 @@ export type PersonResponse = {
   gender: EnumValue<Gender> | null
   birthDate: string | null
   email: string | null
+  address: string | null
+  addressReference: string | null
   birthCountry: CountryLookup
   residentLocation: PersonResidentLocationResponse | null
   phones: PersonPhoneResponse[]
