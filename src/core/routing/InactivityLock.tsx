@@ -12,7 +12,7 @@ const ACTIVITY_EVENTS = [
   'keydown',
   'scroll',
   'touchstart',
-  'popstate', // navegación con el botón atrás/adelante del navegador
+  'popstate', // browser back/forward buttons
   'visibilitychange',
   'focus',
 ] as const

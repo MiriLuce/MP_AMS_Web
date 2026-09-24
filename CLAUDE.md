@@ -97,7 +97,7 @@ The store **does not authenticate** — hence `startSession(token)` / `endSessio
 
 ### Language
 
-Code in English; text the user reads in Spanish (neutral Latin American — the users are Peruvian, no _voseo_). Commit messages in English.
+Code in English — identifiers **and comments**, the same rule as `MPAMS.API` (decided 24-sep-2026). Text the user reads in Spanish (neutral Latin American — the users are Peruvian, no _voseo_). Commit messages in English.
 
 Before naming any domain concept, read **`../specs/glossary.md`** — it carries the ES↔EN table (Cuota → `StudentFeeInstallment`, Familiar → `Relative`, …) so the frontend does not invent `SchoolYear` where the backend said `AcademicYear`.
 

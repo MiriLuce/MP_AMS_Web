@@ -15,9 +15,9 @@ const navy: MantineColorsTuple = [
   '#d7e3f4',
   '#b0c6e8',
   '#7d9fd9',
-  '#456dc4', // ← el primario con primaryShade: 4
+  '#456dc4', // ← primary, with primaryShade: 4
   '#304791',
-  '#212959', // ← el institucional, intacto
+  '#212959', // ← institutional color, unchanged
   '#1a2147',
   '#141a39',
   '#0e132a',
