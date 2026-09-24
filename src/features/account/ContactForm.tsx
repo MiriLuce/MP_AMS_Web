@@ -1,14 +1,20 @@
-import { Button, Group, Stack, TextInput } from '@mantine/core'
+import { Button, Group, Select, Stack, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { districtsQueryOptions } from '@/core/api/catalogs/queries'
+import {
+  departmentsQueryOptions,
+  districtsQueryOptions,
+  provincesQueryOptions,
+} from '@/core/api/catalogs/queries'
 import type { ApiError } from '@/core/api/errors'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
+import { validateEmail } from '@/shared/emailRule'
 import AccountBlock from './AccountBlock'
 import FieldGrid from './FieldGrid'
 import { updateMe } from './api'
 import {
   findUbigeo,
+  toFormErrors,
   toContactFormValues,
   toUpdateRequest,
   type ContactFormValues,
@@ -23,9 +29,21 @@ function ContactForm({ person, onDone }: Props) {
   const form = useForm<ContactFormValues>({
     mode: 'controlled',
     initialValues: toContactFormValues(person),
+    validate: {
+      email: validateEmail,
+      districtId: (value, values) =>
+        values.departmentId !== null && value === null
+          ? 'Completa la ubicación hasta el distrito, o deja vacío el departamento.'
+          : null,
+    },
   })
 
   const { departmentId, provinceId, districtId } = form.values
+  const departmentsQuery = useQuery(departmentsQueryOptions)
+  const provincesQuery = useQuery({
+    ...provincesQueryOptions(Number(departmentId)),
+    enabled: departmentId !== null,
+  })
   const districtsQuery = useQuery({
     ...districtsQueryOptions(Number(departmentId), Number(provinceId)),
     enabled: departmentId !== null && provinceId !== null,
@@ -38,7 +56,30 @@ function ContactForm({ person, onDone }: Props) {
       queryClient.setQueryData(meQueryOptions.queryKey, me)
       onDone()
     },
+    onError: (error) => {
+      if (error.kind === 'validation') {
+        form.setErrors(toFormErrors(error.errors).fieldErrors)
+      } else if (error.code === 'PM_DISTRICT_NOT_FOUND') {
+        form.setFieldError('districtId', error.message)
+      }
+    },
   })
+
+  const saveError = updateMutation.error
+  const isShownOnFields =
+    saveError !== null &&
+    ((saveError.kind === 'validation' && !toFormErrors(saveError.errors).hasUnmappedErrors) ||
+      saveError.code === 'PM_DISTRICT_NOT_FOUND')
+
+  const catalogError = departmentsQuery.error ?? provincesQuery.error ?? districtsQuery.error
+
+  const handleDepartmentChange = (value: string | null) => {
+    form.setValues({ departmentId: value, provinceId: null, districtId: null })
+  }
+
+  const handleProvinceChange = (value: string | null) => {
+    form.setValues({ provinceId: value, districtId: null })
+  }
 
   const handleSubmit = (values: ContactFormValues) => {
     updateMutation.mutate(
@@ -50,10 +91,47 @@ function ContactForm({ person, onDone }: Props) {
     <AccountBlock title="Contacto">
       <form noValidate onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
-          {updateMutation.isError && <ApiErrorAlert error={updateMutation.error} />}
-          {districtsQuery.isError && <ApiErrorAlert error={districtsQuery.error} />}
+          {saveError && !isShownOnFields && <ApiErrorAlert error={saveError} />}
+          {catalogError && <ApiErrorAlert error={catalogError} />}
           <FieldGrid>
             <TextInput label="Correo electrónico" type="email" {...form.getInputProps('email')} />
+            <Select
+              label="Departamento"
+              placeholder="Elige un departamento"
+              searchable
+              clearable
+              data={departmentsQuery.data?.map((department) => ({
+                value: String(department.departmentId),
+                label: department.name,
+              }))}
+              value={departmentId}
+              onChange={handleDepartmentChange}
+            />
+            <Select
+              label="Provincia"
+              placeholder={departmentId ? 'Elige una provincia' : 'Primero elige el departamento'}
+              searchable
+              clearable
+              disabled={departmentId === null}
+              data={provincesQuery.data?.map((province) => ({
+                value: String(province.provinceId),
+                label: province.name,
+              }))}
+              value={provinceId}
+              onChange={handleProvinceChange}
+            />
+            <Select
+              label="Distrito"
+              placeholder={provinceId ? 'Elige un distrito' : 'Primero elige la provincia'}
+              searchable
+              clearable
+              disabled={provinceId === null}
+              data={districtsQuery.data?.map((district) => ({
+                value: String(district.districtId),
+                label: district.name,
+              }))}
+              {...form.getInputProps('districtId')}
+            />
             <TextInput label="Dirección" {...form.getInputProps('address')} />
             <TextInput label="Referencia" {...form.getInputProps('addressReference')} />
           </FieldGrid>
@@ -64,7 +142,7 @@ function ContactForm({ person, onDone }: Props) {
             <Button
               type="submit"
               loading={updateMutation.isPending}
-              disabled={isResolvingLocation || districtsQuery.isError}
+              disabled={isResolvingLocation || catalogError !== null}
             >
               Guardar
             </Button>

@@ -73,3 +73,25 @@ export function toUpdateRequest(
     })),
   }
 }
+
+const FIELD_ALIASES: Record<string, string> = { residentUbigeo: 'districtId' }
+
+const FORM_FIELDS =
+  /^(email|address|addressReference|districtId|phones\.\d+\.(phoneTypeId|number|description))$/
+
+export function toFormErrors(errors: Record<string, string[]>) {
+  const fieldErrors: Record<string, string> = {}
+  let hasUnmappedErrors = false
+
+  for (const [key, messages] of Object.entries(errors)) {
+    const path = key.replace(/\[(\d+)\]/g, '.$1')
+    const field = FIELD_ALIASES[path] ?? path
+    if (FORM_FIELDS.test(field)) {
+      fieldErrors[field] = messages[0]
+    } else {
+      hasUnmappedErrors = true
+    }
+  }
+
+  return { fieldErrors, hasUnmappedErrors }
+}
