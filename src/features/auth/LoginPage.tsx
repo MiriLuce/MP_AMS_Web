@@ -27,8 +27,6 @@ import logoElAlba from '@/assets/logos/logoElAlba.svg'
 import logoMaxPlanck from '@/assets/logos/logoMaxPlanck.svg'
 import logoNuevoHorizonte from '@/assets/logos/logoNuevoHorizonte.svg'
 
-// Espeja IdentifierRules del backend (ADR-004: el userName es el documento de identidad).
-// Si esta constante y la del servidor se separan, se crea gente que no puede entrar.
 const USER_NAME_MAX_LENGTH = 20
 
 function LoginPage() {
@@ -58,8 +56,6 @@ function LoginPage() {
   const loginMutation = useMutation<LoginResponse, ApiError, LoginRequest>({
     mutationFn: login,
     onSuccess: (response, variables) => {
-      // La contraseña viaja al store solo si hay que cambiarla: SetPasswordPage la manda como
-      // `currentPassword` para no pedirla de nuevo. Si no, el store la descarta.
       startSession({
         token: response.accessToken,
         userName: response.user.userName,

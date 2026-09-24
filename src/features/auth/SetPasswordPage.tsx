@@ -16,17 +16,6 @@ import {
 } from './passwordRules'
 import classes from './LoginPage.module.css'
 
-/**
- * Compuerta obligatoria: se entró con una contraseña temporal (usuario nuevo, o un reset hecho por
- * un administrador, que vuelve a poner `MustChangePassword` en true) y hay que definir una propia.
- *
- * No pide la contraseña actual porque la persona la escribió en el login hace segundos y quedó en
- * `authState.temporaryPassword`. El endpoint sigue recibiéndola: es lo único que prueba que quien
- * cambia la contraseña es la dueña de la cuenta y no alguien que solo consiguió el token.
- *
- * El cambio voluntario es otra pantalla (`ChangePasswordPage`), dentro del AppLayout y con los tres
- * campos, porque ahí la contraseña actual sí hay que escribirla.
- */
 function SetPasswordPage() {
   const temporaryPassword = useSessionStore((state) => state.authState?.temporaryPassword ?? null)
   const passwordChanged = useSessionStore((state) => state.passwordChanged)
@@ -50,9 +39,6 @@ function SetPasswordPage() {
   })
 
   const handleSubmit = (values: { newPassword: string }) => {
-    // No puede ser null: esta ruta solo se alcanza con `mustChangePassword` en true, y el store
-    // guarda la contraseña temporal exactamente mientras esa bandera lo esté. El corte está para
-    // acotar el tipo en el punto de uso, no porque se espere el caso.
     if (temporaryPassword === null) return
 
     setPasswordMutation.mutate({

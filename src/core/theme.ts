@@ -32,8 +32,6 @@ export const theme = createTheme({
   cursorType: 'pointer',
   respectReducedMotion: true,
 
-  // @fontsource-variable packages register the family with a "Variable" suffix.
-  // Without it the browser silently falls back to the system font.
   fontFamily: "'Inter Variable', 'Inter', 'Segoe UI', system-ui, sans-serif",
 
   headings: {

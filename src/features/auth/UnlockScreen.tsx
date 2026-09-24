@@ -43,8 +43,6 @@ function UnlockScreen() {
     loginMutation.mutate({ userName: authState.userName, password: values.password })
   }
 
-  // Desbloquear **reautentica** manda un `login`, no un cambio de contraseña.
-  // Así que la contraseña que el backend acepta es la vigente
   const isTemporaryPassword = authState.mustChangePassword
 
   return (

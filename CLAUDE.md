@@ -88,6 +88,8 @@ The **JWT lives in memory only** — never `localStorage` or `sessionStorage` (X
 
 The store **does not authenticate** — hence `startSession(token)` / `endSession()`, not `login`/`logout`. The network call is `features/auth/api.ts`'s `login()`.
 
+`endSession()` also **clears the react-query cache**, or the next user of the tab sees the previous one's data. It lives there and not at the call sites because there are three exits (account menu, `UnlockScreen`, the 401 interceptor) and the one that happens unattended runs outside React. Order matters: `set` first, so the guards unmount whatever is fetching, then `clear()`.
+
 `LoginResponse` does **not** carry permissions. They exist only as claims inside the JWT, so the frontend decodes the token to build the menu and the route guards. **The UI adapts to permissions, never to a role name.**
 
 ## Conventions
@@ -174,6 +176,7 @@ Mantine 9 specifics:
 - **A Mantine `NavLink`'s `children` are not its text** — they are nested items. The text is `label`. `<NavLink>Inicio</NavLink>` renders an unlabelled item with loose text and no padding, and looks like "Mantine without styles".
 - **`active` is a boolean you control.** Mantine knows nothing about routes. Bridge with `useMatch({ path: to, end: to === '/' })` — **with `end`**, or `/academic-years/2027` switches the "Años Escolares" item off. The root exception is mandatory: without it `/` matches everything.
 - `AppShell` infers no measurements: `header={{ height }}` and `navbar={{ width, breakpoint }}` are required, and `padding` goes on the `AppShell`, not on `Main`.
+- **`useForm` in `uncontrolled` mode does not re-render on typing**, so `form.values` read inside a validator points at the previous render's object. A rule that depends on another field reads it from the validator's second parameter, `(value, values)`, which holds the live values.
 
 Tooling:
 
@@ -181,6 +184,7 @@ Tooling:
 - `tsconfig.app.json` has **no `baseUrl`**: TypeScript 6 makes it an error, and since TS 5 `paths` resolves relative to the tsconfig itself, so `"@/*": ["./src/*"]` works without it.
 - A `Cannot find module` about something named in a config almost always means the package is not installed, not that the file is misspelled.
 - `@mantine/core/styles.css` is imported **before** `./index.css`, so local styles can override Mantine's.
+- `@fontsource-variable/*` packages register the family with a **`Variable` suffix** (`'Inter Variable'`). Without it the browser silently falls back to the system font.
 
 ## Deliberately not installed
 

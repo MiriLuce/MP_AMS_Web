@@ -13,17 +13,10 @@ type AuthState = {
   roles: Set<string> | undefined
   permissions: Set<string> | undefined
   mustChangePassword: boolean
-  // La contraseña temporal con la que se acaba de entrar, guardada solo mientras
-  // `mustChangePassword` la exija. SetPasswordPage la manda como `currentPassword`, así la persona
-  // no retipea lo que escribió hace cinco segundos y el endpoint sigue exigiendo la contraseña
-  // anterior — que es lo único que distingue a la dueña de la cuenta de quien solo robó el token.
-  // La limpia `passwordChanged()`; `endSession()` se la lleva puesta. Nunca sale de la pestaña.
   temporaryPassword: string | null
   isLocked: boolean
 }
 
-// Objeto y no cuatro posicionales: el tercer argumento es un booleano suelto, y en el call site
-// `startSession(t, u, false, p)` no se puede leer sin abrir esta definición.
 type StartSessionInput = {
   token: string
   userName: string
@@ -41,14 +34,6 @@ type SessionStore = {
   passwordChanged: () => void
 }
 
-// La forma del JWT, no la de LoginResponse. Los nombres son los del token tal cual: los claims son
-// sensibles a mayúsculas, y escribir mal uno da `undefined` sin ningún error
-//
-// `sub` es string aunque `LoginResponse.user.userId` sea number: mismo dato, dos serializaciones.
-// RFC 7519 exige que `sub` sea un string, así que no va a cambiar.
-//
-// No hay claim con el nombre de usuario, a propósito: sería el documento de identidad (ADR-004) y un
-// JWT viaja sin cifrar en cada request. Para mostrar el nombre está `LoginResponse.user`.
 type DecodedToken = {
   exp: number
   sub: string
@@ -87,17 +72,6 @@ export const useSessionStore = create<SessionStore>((set) => ({
   },
   endSession: () => {
     set({ authState: null })
-    // La caché de react-query es un sistema aparte: dejar `authState` en null no la toca, y sin
-    // esto el próximo usuario de esta pestaña ve los datos del anterior.
-    //
-    // Va aquí y no en el `onClick` del menú porque hay **tres** salidas de sesión — el menú de
-    // cuenta, el botón de `UnlockScreen` y el interceptor del 401 en `client.ts` — y la del
-    // interceptor corre fuera de React, donde `useQueryClient()` no existe. Repartida entre los
-    // call sites, la salida que más importa (la que ocurre sola, sin que nadie mire) sería la
-    // única que no la hace.
-    //
-    // El orden importa: primero `set`, para que las guardas desmonten lo que esté consultando, y
-    // recién después `clear()`.
     queryClient.clear()
   },
   lockSession: () => {

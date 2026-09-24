@@ -25,21 +25,12 @@ import {
 } from './passwordRules'
 import classes from './LoginPage.module.css'
 
-/**
- * Cambio voluntario, desde el menú y dentro del AppLayout. Acá la contraseña actual **sí** se pide:
- * es la reautenticación que evita que alguien que encontró la sesión abierta se quede con la cuenta.
- *
- * La compuerta obligatoria por contraseña temporal es otra pantalla (`SetPasswordPage`), a pantalla
- * completa y con dos campos.
- */
 function ChangePasswordPage() {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
     validate: {
       currentPassword: (value) => (value.trim() ? null : 'La contraseña actual es obligatoria.'),
-      // El segundo parámetro son los valores vivos: en modo uncontrolled escribir no re-renderiza,
-      // así que `form.values` apuntaría al objeto del render anterior.
       newPassword: (value, values) => validateNewPassword(value, values.currentPassword),
       confirmPassword: (value, values) => validatePasswordConfirmation(value, values.newPassword),
     },
@@ -51,9 +42,6 @@ function ChangePasswordPage() {
     ChangePasswordRequest
   >({
     mutationFn: changePassword,
-    // No navega a ninguna parte: el cambio voluntario se hace desde el menú, así que sacar a la
-    // persona de la pantalla le quita la única señal de que funcionó. Se limpia el formulario y se
-    // confirma en el lugar.
     onSuccess: () => {
       form.reset()
     },
