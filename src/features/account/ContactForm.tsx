@@ -34,10 +34,9 @@ function ContactForm({ person, onDone }: Props) {
     initialValues: toContactFormValues(person),
     validate: {
       email: validateEmail,
-      districtId: (value, values) =>
-        values.departmentId !== null && value === null
-          ? 'Completa la ubicación hasta el distrito, o deja vacío el departamento.'
-          : null,
+      departmentId: (value) => (value ? null : 'Elige el departamento.'),
+      provinceId: (value) => (value ? null : 'Elige la provincia.'),
+      districtId: (value) => (value ? null : 'Elige el distrito.'),
       phones: {
         phoneTypeId: (value) => (value ? null : 'El tipo de teléfono es obligatorio.'),
         number: validatePhoneNumber,
@@ -89,10 +88,12 @@ function ContactForm({ person, onDone }: Props) {
 
   const handleDepartmentChange = (value: string | null) => {
     form.setValues({ departmentId: value, provinceId: null, districtId: null })
+    form.clearFieldError('departmentId')
   }
 
   const handleProvinceChange = (value: string | null) => {
     form.setValues({ provinceId: value, districtId: null })
+    form.clearFieldError('provinceId')
   }
 
   const handleSubmit = (values: ContactFormValues) => {
@@ -113,19 +114,22 @@ function ContactForm({ person, onDone }: Props) {
               label="Departamento"
               placeholder="Elige un departamento"
               searchable
-              clearable
+              required
+              allowDeselect={false}
               data={departmentsQuery.data?.map((department) => ({
                 value: String(department.departmentId),
                 label: department.name,
               }))}
               value={departmentId}
               onChange={handleDepartmentChange}
+              error={form.errors.departmentId}
             />
             <Select
               label="Provincia"
               placeholder={departmentId ? 'Elige una provincia' : 'Primero elige el departamento'}
               searchable
-              clearable
+              required
+              allowDeselect={false}
               disabled={departmentId === null}
               data={provincesQuery.data?.map((province) => ({
                 value: String(province.provinceId),
@@ -133,12 +137,14 @@ function ContactForm({ person, onDone }: Props) {
               }))}
               value={provinceId}
               onChange={handleProvinceChange}
+              error={form.errors.provinceId}
             />
             <Select
               label="Distrito"
               placeholder={provinceId ? 'Elige un distrito' : 'Primero elige la provincia'}
               searchable
-              clearable
+              required
+              allowDeselect={false}
               disabled={provinceId === null}
               data={districtsQuery.data?.map((district) => ({
                 value: String(district.districtId),
