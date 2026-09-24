@@ -3,6 +3,11 @@ export type Gender = 'Male' | 'Female' | 'Other'
 export type EmployeeStatus =
   'Active' | 'OnLeave' | 'Suspended' | 'Resigned' | 'Retired' | 'Terminated'
 
+export type EnumValue<T extends string> = {
+  code: T
+  displayName: string
+}
+
 export type Lookup<T extends string> = {
   id: number
   displayName: string
@@ -42,7 +47,7 @@ export type PersonResponse = {
   middleName: string | null
   fatherLastName: string
   motherLastName: string | null
-  gender: Gender | null
+  gender: EnumValue<Gender> | null
   birthDate: string | null
   email: string | null
   birthCountry: CountryLookup
@@ -52,7 +57,7 @@ export type PersonResponse = {
 
 export type MeEmploymentResponse = {
   jobTitle: JobTitleLookup
-  status: EmployeeStatus
+  status: EnumValue<EmployeeStatus>
   admissionDate: string
 }
 

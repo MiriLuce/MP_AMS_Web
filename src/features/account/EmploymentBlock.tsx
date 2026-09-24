@@ -2,7 +2,6 @@ import { Badge, Group, Text } from '@mantine/core'
 import { formatDate } from '@/shared/formatDate'
 import AccountBlock from './AccountBlock'
 import Field from './Field'
-import { EMPLOYEE_STATUS_LABELS } from './labels'
 import type { MeEmploymentResponse } from './types'
 
 type Props = { employment: MeEmploymentResponse | null; roles: string[] }
@@ -13,7 +12,7 @@ function EmploymentBlock({ employment, roles }: Props) {
       {employment ? (
         <>
           <Field label="Cargo en la institución" value={employment.jobTitle.displayName} />
-          <Field label="Estado" value={EMPLOYEE_STATUS_LABELS[employment.status]} />
+          <Field label="Estado" value={employment.status.displayName} />
           <Field label="Fecha de ingreso" value={formatDate(employment.admissionDate)} />
         </>
       ) : (
