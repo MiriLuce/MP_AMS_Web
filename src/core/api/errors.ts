@@ -24,7 +24,11 @@ type ForbiddenError = {
 type BusinessError = {
   kind: 'business'
   message: string
-  code: 'EM_ENROLLMENT_ALREADY_EXISTS' | 'IN_INSTITUTION_NOT_FOUND' | (string & {})
+  code:
+    | 'EM_ENROLLMENT_ALREADY_EXISTS'
+    | 'IN_INSTITUTION_NOT_FOUND'
+    | 'SY_USER_NOT_FOUND'
+    | (string & {})
   traceId: string
 }
 type UnknownError = {
