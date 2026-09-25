@@ -13,7 +13,7 @@ import NotFoundPage from '@/core/routing/NotFoundPage'
 import LoginPage from '@/features/auth/LoginPage'
 import ChangePasswordPage from '@/features/auth/ChangePasswordPage'
 import SetPasswordPage from '@/features/auth/SetPasswordPage'
-import MyAccountPage from './features/account/MyAccountPage'
+import MyAccountPage from '@/features/account/MyAccountPage'
 
 function App() {
   return (

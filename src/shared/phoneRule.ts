@@ -3,7 +3,7 @@ const MIN_DIGITS = 6
 const MAX_DIGITS = 15
 const MAX_LENGTH = 25
 
-const countDigits = (value: string) => value.replace(/\D/g, '').length
+const onlyDigits = (value: string) => value.replace(/\D/g, '')
 
 export function validatePhoneNumber(value: string): string | null {
   const number = value.trim()
@@ -14,7 +14,7 @@ export function validatePhoneNumber(value: string): string | null {
   if (!ALLOWED_CHARACTERS.test(number)) {
     return 'El número de teléfono solo puede tener dígitos, espacios, guiones, paréntesis y un + al inicio.'
   }
-  const digits = countDigits(number)
+  const digits = onlyDigits(number).length
   if (digits < MIN_DIGITS || digits > MAX_DIGITS) {
     return `El número de teléfono debe tener entre ${MIN_DIGITS} y ${MAX_DIGITS} dígitos.`
   }
@@ -26,7 +26,7 @@ const groupCellphone = (digits: string) => digits.replace(/^(\d{3})(\d{3})(\d{3}
 export function formatPhoneNumber(value: string): string {
   const number = value.trim()
   if (!ALLOWED_CHARACTERS.test(number)) return number
-  const digits = number.replace(/\D/g, '')
+  const digits = onlyDigits(number)
 
   if (digits.length === 11 && digits.startsWith('51'))
     return `+51 ${groupCellphone(digits.slice(2))}`

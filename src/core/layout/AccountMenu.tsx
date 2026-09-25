@@ -4,9 +4,9 @@ import { useSessionStore } from '@/core/session/store'
 import { Link } from 'react-router'
 
 function AccountMenu() {
-  const displayName = useSessionStore((state) => state?.authState?.displayName ?? null)
-  const avatarName = useSessionStore((state) => state?.authState?.avatarName ?? null)
-  const userName = useSessionStore((state) => state?.authState?.userName ?? null)
+  const displayName = useSessionStore((state) => state.authState?.displayName ?? null)
+  const avatarName = useSessionStore((state) => state.authState?.avatarName ?? null)
+  const userName = useSessionStore((state) => state.authState?.userName ?? null)
   const endSession = useSessionStore((state) => state.endSession)
 
   return (
