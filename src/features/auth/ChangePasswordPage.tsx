@@ -92,16 +92,15 @@ function ChangePasswordPage() {
                   key={form.key('confirmPassword')}
                   {...form.getInputProps('confirmPassword')}
                 />
+                <Group justify="flex-end" mt="xs">
+                  <Button type="submit" loading={changePasswordMutation.isPending}>
+                    Guardar contraseña
+                  </Button>
+                </Group>
               </Stack>
 
               <PasswordRequirements title="Requisitos de la nueva contraseña" />
             </SimpleGrid>
-
-            <Group justify="flex-end">
-              <Button type="submit" loading={changePasswordMutation.isPending}>
-                Cambiar contraseña
-              </Button>
-            </Group>
           </Stack>
         </form>
       </Paper>
