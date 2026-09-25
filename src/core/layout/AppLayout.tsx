@@ -1,9 +1,11 @@
 import { AppShell, Burger, Group, NavLink, Title, ThemeIcon } from '@mantine/core'
 import { useMatch, NavLink as RouterNavLink, Outlet } from 'react-router'
 import { useDisclosure } from '@mantine/hooks'
-import { IconCalendar, IconHome, IconUsers, type TablerIcon } from '@tabler/icons-react'
+import type { TablerIcon } from '@tabler/icons-react'
 import AccountMenu from '@/core/layout/AccountMenu'
 import { BRAND_NAME, BRAND_SHORT_NAME } from '@/core/brand'
+import { useSessionStore } from '@/core/session/store'
+import { NAV_ITEMS, visibleNavItems } from './navigation'
 
 function NavLinkItem({
   to,
@@ -37,6 +39,8 @@ function AppLayout() {
   const [mobileNavBarOpened, { toggle: toggleMobileNavBar, close: closeMobileNavBar }] =
     useDisclosure(false)
   const [desktopNavBarOpened, { toggle: toggleDesktopNavBar }] = useDisclosure(true)
+  const permissions = useSessionStore((state) => state.authState?.permissions)
+  const navItems = visibleNavItems(NAV_ITEMS, permissions ?? new Set())
 
   return (
     <AppShell
@@ -72,19 +76,15 @@ function AppLayout() {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar>
-        <NavLinkItem to="/" label="Inicio" Icon={IconHome} onNavigate={closeMobileNavBar} />
-        <NavLinkItem
-          to="/academic-years"
-          label="Años Escolares"
-          Icon={IconCalendar}
-          onNavigate={closeMobileNavBar}
-        />
-        <NavLinkItem
-          to="/employees"
-          label="Empleados"
-          Icon={IconUsers}
-          onNavigate={closeMobileNavBar}
-        />
+        {navItems.map((item) => (
+          <NavLinkItem
+            key={item.to}
+            to={item.to}
+            label={item.label}
+            Icon={item.Icon}
+            onNavigate={closeMobileNavBar}
+          />
+        ))}
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />

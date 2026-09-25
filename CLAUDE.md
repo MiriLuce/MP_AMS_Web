@@ -95,6 +95,10 @@ The store **does not authenticate** — hence `startSession(token)` / `endSessio
 
 `LoginResponse` does **not** carry permissions. They exist only as claims inside the JWT, so the frontend decodes the token to build the menu and the route guards. **The UI adapts to permissions, never to a role name.**
 
+**The navbar is built from `core/layout/navigation.ts`** and filtered by `visibleNavItems`: an item with `anyOf` shows only when the session holds at least one of those permissions; an item without it is always visible. An item the user cannot open is **hidden, not disabled** (decided 24-sep-2026). A screen gets its menu item when it is real — placeholder routes stay out of the menu. Hiding is UX only: the route keeps its `RequirePermission`, and the backend its `403`.
+
+**Permission strings live in `core/permissions.ts`** (`PERMISSIONS.HR.EmployeeView`), shared by routes and menu, so a typo cannot hide in one of two copies. Declare a permission when a screen uses it, not the whole backend catalog up front.
+
 ### Tests
 
 Vitest + Testing Library, in `jsdom`. A test lives next to what it tests (`phoneRule.ts` → `phoneRule.test.ts`). `src/test/` holds the shared pieces: `setup.ts` (jest-dom matchers and the `matchMedia`/`ResizeObserver` stubs Mantine needs in jsdom), `renderWithProviders` (router, Mantine theme and a fresh `QueryClient` without retries) and `startTestSession` (a real `startSession` call with a hand-built JWT).

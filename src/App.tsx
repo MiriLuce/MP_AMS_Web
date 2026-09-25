@@ -8,6 +8,7 @@ import RequireAnonymous from '@/core/routing/RequireAnonymous'
 import InactivityLock from '@/core/routing/InactivityLock'
 import RequirePasswordChanged from '@/core/routing/RequirePasswordChanged'
 import RequirePermission from '@/core/routing/RequirePermission'
+import { PERMISSIONS } from '@/core/permissions'
 
 import NotFoundPage from '@/core/routing/NotFoundPage'
 import LoginPage from '@/features/auth/LoginPage'
@@ -31,10 +32,12 @@ function App() {
                 <Route path="/" element={<Title>Inicio</Title>} />
                 <Route path="/change-password" element={<ChangePasswordPage />} />
                 <Route path="/my-account" element={<MyAccountPage />} />
-                <Route element={<RequirePermission permission="EM:AcademicYear.Manage" />}>
+                <Route
+                  element={<RequirePermission permission={PERMISSIONS.EM.AcademicYearManage} />}
+                >
                   <Route path="/academic-years" element={<Title>Años Escolares</Title>} />
                 </Route>
-                <Route element={<RequirePermission permission="HR:Employee.View" />}>
+                <Route element={<RequirePermission permission={PERMISSIONS.HR.EmployeeView} />}>
                   <Route path="/employees" element={<Title>Empleados</Title>} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
