@@ -22,14 +22,15 @@ npm run format:check   # prettier --check .
 
 There is no test runner yet. When one is added, note it here.
 
-### The three gates
+### The gates
 
-Nothing is finished until all three pass:
+Nothing is finished until all four pass:
 
 ```bash
 npx tsc -b --force     # types
 npx eslint src         # lint
 npx prettier --check src
+npm test               # vitest run
 ```
 
 `--force` matters: `tsc -b` is incremental and will happily report success from a stale `.tsbuildinfo`.
@@ -94,6 +95,16 @@ The store **does not authenticate** — hence `startSession(token)` / `endSessio
 
 `LoginResponse` does **not** carry permissions. They exist only as claims inside the JWT, so the frontend decodes the token to build the menu and the route guards. **The UI adapts to permissions, never to a role name.**
 
+### Tests
+
+Vitest + Testing Library, in `jsdom`. A test lives next to what it tests (`phoneRule.ts` → `phoneRule.test.ts`). `src/test/` holds the shared pieces: `setup.ts` (jest-dom matchers and the `matchMedia`/`ResizeObserver` stubs Mantine needs in jsdom), `renderWithProviders` (router, Mantine theme and a fresh `QueryClient` without retries) and `startTestSession` (a real `startSession` call with a hand-built JWT).
+
+What gets a test:
+
+- **Pure logic, always**: validation rules that mirror the backend, formatters, form-value mapping, error translation, the retry rule, the session store. These are cheap and are where a wrong edit hides.
+- **A component test only for a decision that does not show in the code** and that a well-meant change could break — the replacement for the justification comment the project does not write. Current ones: `UnlockScreen` shows the name and never the document (`ADR-004`); `RequirePermission` renders the 403 in place; `InactivityLock` locks on the first event after the limit and ends an expired session even when locked; `MyAccountPage` replaces the `SY_USER_NOT_FOUND` message; `ApiErrorAlert` shows the `traceId` only for unexpected errors.
+- Mock the feature's `api.ts` with `vi.mock`, not Axios. Wider flows through the network layer are integration tests (see `../specs/ESTADO.md`) and need MSW, which is not installed yet.
+
 ## Conventions
 
 ### Language
@@ -138,7 +149,7 @@ Follow them. These are the ones this codebase has already paid for:
 
 **Correctness**
 
-- Run the three gates before calling anything done. ESLint catches neither of the two worst bugs found here: JSX where `(cond && <X/>)` without braces renders as literal text, and `form.errors` being truthy because `{}` is truthy.
+- Run the four gates before calling anything done. ESLint catches neither of the two worst bugs found here: JSX where `(cond && <X/>)` without braces renders as literal text, and `form.errors` being truthy because `{}` is truthy.
 - A `as` cast almost always means a type is declared wrong further up. Fix the declaration.
 - Do not add a `?.` or a `| null` for a case that cannot happen — a defensive guard for an impossible state makes readers hunt for when it _can_.
 - Verify a claim before writing it down. Every contract error this project has hit came from a document that asserted something the code did not do.
