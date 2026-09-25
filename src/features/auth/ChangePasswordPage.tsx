@@ -1,4 +1,13 @@
-import { Alert, Button, Container, Paper, PasswordInput, Stack } from '@mantine/core'
+import {
+  Alert,
+  Button,
+  Container,
+  Group,
+  Paper,
+  PasswordInput,
+  SimpleGrid,
+  Stack,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconCheck } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
@@ -41,11 +50,8 @@ function ChangePasswordPage() {
   }
 
   return (
-    <Container size={460} py="xl">
-      <PageHeader
-        title="Cambiar contraseña"
-        description="Necesitas tu contraseña actual para definir una nueva."
-      />
+    <Container size="md" py="xl">
+      <PageHeader title="Cambiar contraseña" />
 
       <Paper withBorder shadow="sm" p="xl">
         <form noValidate onSubmit={form.onSubmit(handleSubmit)}>
@@ -59,37 +65,43 @@ function ChangePasswordPage() {
               </Alert>
             )}
 
-            <PasswordRequirements title="Requisitos de la nueva contraseña" />
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
+              <Stack gap="md">
+                <PasswordInput
+                  label="Contraseña actual"
+                  placeholder="Ingresa tu contraseña actual"
+                  autoComplete="current-password"
+                  required
+                  data-autofocus
+                  key={form.key('currentPassword')}
+                  {...form.getInputProps('currentPassword')}
+                />
+                <PasswordInput
+                  label="Nueva contraseña"
+                  placeholder="Ingresa tu nueva contraseña"
+                  autoComplete="new-password"
+                  required
+                  key={form.key('newPassword')}
+                  {...form.getInputProps('newPassword')}
+                />
+                <PasswordInput
+                  label="Confirma la nueva contraseña"
+                  placeholder="Vuelve a ingresar la nueva contraseña"
+                  autoComplete="new-password"
+                  required
+                  key={form.key('confirmPassword')}
+                  {...form.getInputProps('confirmPassword')}
+                />
+              </Stack>
 
-            <PasswordInput
-              label="Contraseña actual"
-              placeholder="Ingresa tu contraseña actual"
-              autoComplete="current-password"
-              required
-              data-autofocus
-              key={form.key('currentPassword')}
-              {...form.getInputProps('currentPassword')}
-            />
-            <PasswordInput
-              label="Nueva contraseña"
-              placeholder="Ingresa tu nueva contraseña"
-              autoComplete="new-password"
-              required
-              key={form.key('newPassword')}
-              {...form.getInputProps('newPassword')}
-            />
-            <PasswordInput
-              label="Confirma la nueva contraseña"
-              placeholder="Vuelve a ingresar la nueva contraseña"
-              autoComplete="new-password"
-              required
-              key={form.key('confirmPassword')}
-              {...form.getInputProps('confirmPassword')}
-            />
+              <PasswordRequirements title="Requisitos de la nueva contraseña" />
+            </SimpleGrid>
 
-            <Button fullWidth mt="xs" type="submit" loading={changePasswordMutation.isPending}>
-              Cambiar contraseña
-            </Button>
+            <Group justify="flex-end">
+              <Button type="submit" loading={changePasswordMutation.isPending}>
+                Cambiar contraseña
+              </Button>
+            </Group>
           </Stack>
         </form>
       </Paper>
