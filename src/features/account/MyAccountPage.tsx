@@ -1,7 +1,8 @@
-import { Center, Container, Loader, Stack, Title } from '@mantine/core'
+import { Center, Container, Loader, Stack } from '@mantine/core'
 import { useQuery } from '@tanstack/react-query'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
 import InfoAlert from '@/shared/InfoAlert'
+import PageHeader from '@/shared/PageHeader'
 import ContactBlock from './ContactBlock'
 import EmploymentBlock from './EmploymentBlock'
 import IdentityBlock from './IdentityBlock'
@@ -14,9 +15,7 @@ function MyAccountPage() {
   return (
     <Container size="md" py="xl">
       <Stack gap="lg">
-        <Title order={2} mb="md">
-          Mis datos
-        </Title>
+        <PageHeader title="Mis datos" />
         {isPending && (
           <Center py="xl">
             <Loader />

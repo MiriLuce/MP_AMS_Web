@@ -56,6 +56,7 @@ function ContactBlock({ person }: Props) {
               <Table
                 w="auto"
                 withRowBorders={false}
+                highlightOnHover={false}
                 verticalSpacing={4}
                 styles={{ td: { paddingLeft: 0, paddingRight: 'var(--mantine-spacing-xl)' } }}
               >

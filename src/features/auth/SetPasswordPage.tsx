@@ -14,7 +14,6 @@ import {
   validateNewPassword,
   validatePasswordConfirmation,
 } from './passwordRules'
-import classes from './LoginPage.module.css'
 
 function SetPasswordPage() {
   const temporaryPassword = useSessionStore((state) => state.authState?.temporaryPassword ?? null)
@@ -50,7 +49,7 @@ function SetPasswordPage() {
   return (
     <Container size={460} my={60}>
       <Stack gap="xs" mb="xl">
-        <Title order={2} ta="center" className={classes.title}>
+        <Title order={2} ta="center">
           Define tu contraseña
         </Title>
         <Text c="dimmed" size="sm" ta="center">

@@ -3,6 +3,7 @@ import { useMatch, NavLink as RouterNavLink, Outlet } from 'react-router'
 import { useDisclosure } from '@mantine/hooks'
 import { IconCalendar, IconHome, IconUsers, type TablerIcon } from '@tabler/icons-react'
 import AccountMenu from '@/core/layout/AccountMenu'
+import { BRAND_NAME, BRAND_SHORT_NAME } from '@/core/brand'
 
 function NavLinkItem({
   to,
@@ -62,10 +63,10 @@ function AppLayout() {
             visibleFrom="sm"
           />
           <Title visibleFrom="sm" order={3}>
-            Colegios y Academia Max Planck
+            {BRAND_NAME}
           </Title>
           <Title hiddenFrom="sm" order={3}>
-            Max Planck
+            {BRAND_SHORT_NAME}
           </Title>
           <AccountMenu />
         </Group>

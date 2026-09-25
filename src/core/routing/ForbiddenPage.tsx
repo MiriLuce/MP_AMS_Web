@@ -1,15 +1,12 @@
-import { Stack, Text, Title, Button } from '@mantine/core'
-import { Link } from 'react-router'
+import StatusPage from './StatusPage'
 
 function ForbiddenPage() {
   return (
-    <Stack align="center" justify="center">
-      <Title order={1}>403 - Acceso denegado</Title>
-      <Text>No tienes permiso para acceder a esta página.</Text>
-      <Button component={Link} to="/">
-        Volver al inicio
-      </Button>
-    </Stack>
+    <StatusPage
+      code={403}
+      title="Acceso denegado"
+      message="No tienes permiso para acceder a esta página."
+    />
   )
 }
 

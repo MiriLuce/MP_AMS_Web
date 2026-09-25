@@ -1,14 +1,4 @@
-import {
-  Alert,
-  Button,
-  Container,
-  List,
-  Paper,
-  PasswordInput,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core'
+import { Alert, Button, Container, List, Paper, PasswordInput, Stack } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconCheck } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
@@ -23,7 +13,7 @@ import {
   validateNewPassword,
   validatePasswordConfirmation,
 } from './passwordRules'
-import classes from './LoginPage.module.css'
+import PageHeader from '@/shared/PageHeader'
 
 function ChangePasswordPage() {
   const form = useForm({
@@ -55,15 +45,11 @@ function ChangePasswordPage() {
   }
 
   return (
-    <Container size={460}>
-      <Stack gap="xs" mb="xl">
-        <Title order={2} className={classes.title}>
-          Cambiar contraseña
-        </Title>
-        <Text c="dimmed" size="sm">
-          Necesitas tu contraseña actual para definir una nueva.
-        </Text>
-      </Stack>
+    <Container size={460} py="xl">
+      <PageHeader
+        title="Cambiar contraseña"
+        description="Necesitas tu contraseña actual para definir una nueva."
+      />
 
       <Paper withBorder shadow="sm" p="xl">
         <form noValidate onSubmit={form.onSubmit(handleSubmit)}>

@@ -23,6 +23,7 @@ import type { ApiError } from '@/core/api/errors'
 import type { LoginRequest, LoginResponse } from './types'
 import { login } from './api'
 import classes from './LoginPage.module.css'
+import { BRAND_NAME } from '@/core/brand'
 import logoElAlba from '@/assets/logos/logoElAlba.svg'
 import logoMaxPlanck from '@/assets/logos/logoMaxPlanck.svg'
 import logoNuevoHorizonte from '@/assets/logos/logoNuevoHorizonte.svg'
@@ -76,7 +77,7 @@ function LoginPage() {
     <Flex mih="100dvh">
       <Box className={classes.panel} visibleFrom="md" w="60%">
         <Text fw={700} fz="2.25rem" lh={1.2}>
-          Bienvenido a Colegios <br /> y Academia Max Planck
+          Bienvenido a {BRAND_NAME}
         </Text>
         <Stack gap="lg" align="center" mt="md">
           <Group justify="center" align="center">
@@ -107,10 +108,13 @@ function LoginPage() {
       <Center flex={1} px="md">
         <Container size={420} w="100%">
           <Stack gap="xs" mb="xl">
-            <Title order={1} ta="center" className={classes.title} hiddenFrom="md">
-              Bienvenido a <span className={classes.highlight}>Colegios y Academia Max Planck</span>
+            <Title order={1} ta="center" hiddenFrom="md">
+              Bienvenido a{' '}
+              <Text span inherit c="navy.6">
+                {BRAND_NAME}
+              </Text>
             </Title>
-            <Title order={1} ta="center" className={classes.title} visibleFrom="md">
+            <Title order={1} ta="center" visibleFrom="md">
               Iniciar sesión
             </Title>
             <Text c="dimmed" size="sm" ta="center">

@@ -8,7 +8,7 @@ import ApiErrorAlert from '@/shared/ApiErrorAlert'
 import type { ApiError } from '@/core/api/errors'
 import type { LoginRequest, LoginResponse } from './types'
 import { login } from './api'
-import classes from './LoginPage.module.css'
+import { BRAND_NAME } from '@/core/brand'
 
 function UnlockScreen() {
   const startSession = useSessionStore((state) => state.startSession)
@@ -51,7 +51,7 @@ function UnlockScreen() {
         <ThemeIcon size={48} radius="xl">
           <IconLock size={26} />
         </ThemeIcon>
-        <Title order={3} ta="center" className={classes.title}>
+        <Title order={3} ta="center">
           Sesión bloqueada
         </Title>
         <Text fw={500} ta="center">
@@ -67,7 +67,9 @@ function UnlockScreen() {
         ) : (
           <Text c="dimmed" size="sm" ta="center">
             Ingresa tu contraseña para volver a{' '}
-            <span className={classes.highlight}>Colegios y Academia Max Planck</span>
+            <Text span inherit c="navy.6" fw={500}>
+              {BRAND_NAME}
+            </Text>
           </Text>
         )}
       </Stack>
