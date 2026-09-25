@@ -23,19 +23,17 @@ apiClient.interceptors.response.use(
       return Promise.reject(error)
     }
     const apiError = toApiError(error)
-    console.error(
-      '[API Error]:',
-      apiError.code,
-      apiError.message,
-      'traceId' in apiError ? apiError.traceId : '(sin traceId)',
-    )
+    if (import.meta.env.DEV && (apiError.kind === 'unknown' || apiError.kind === 'network')) {
+      console.error(
+        '[API]',
+        apiError.code,
+        apiError.message,
+        'traceId' in apiError ? apiError.traceId : '',
+      )
+    }
 
-    if (apiError.kind === 'unauthenticated') {
-      const hadSession = useSessionStore.getState().authState !== null
-      if (hadSession) {
-        useSessionStore.getState().endSession()
-        console.warn('Sesión expirada.')
-      }
+    if (apiError.kind === 'unauthenticated' && useSessionStore.getState().authState !== null) {
+      useSessionStore.getState().endSession()
     }
     return Promise.reject(apiError)
   },

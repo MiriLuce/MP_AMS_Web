@@ -10,8 +10,8 @@ type AuthState = {
   userName: string
   displayName: string
   avatarName: string
-  roles: Set<string> | undefined
-  permissions: Set<string> | undefined
+  roles: Set<string>
+  permissions: Set<string>
   mustChangePassword: boolean
   temporaryPassword: string | null
   isLocked: boolean
@@ -37,9 +37,12 @@ type SessionStore = {
 type DecodedToken = {
   exp: number
   sub: string
-  role: string | string[]
-  permission: string | string[]
+  role?: string | string[]
+  permission?: string | string[]
 }
+
+const toClaimSet = (claim: string | string[] | undefined) =>
+  new Set(claim === undefined ? [] : Array.isArray(claim) ? claim : [claim])
 
 export const useSessionStore = create<SessionStore>((set) => ({
   authState: null,
@@ -52,18 +55,8 @@ export const useSessionStore = create<SessionStore>((set) => ({
       userName: userName,
       displayName: `${firstName} ${fatherLastName}`,
       avatarName: `${firstName[0]}${fatherLastName[0]}`,
-      roles:
-        decodedToken.role === undefined
-          ? undefined
-          : new Set(Array.isArray(decodedToken.role) ? decodedToken.role : [decodedToken.role]),
-      permissions:
-        decodedToken.permission === undefined
-          ? undefined
-          : new Set(
-              Array.isArray(decodedToken.permission)
-                ? decodedToken.permission
-                : [decodedToken.permission],
-            ),
+      roles: toClaimSet(decodedToken.role),
+      permissions: toClaimSet(decodedToken.permission),
       mustChangePassword: mustChangePassword,
       temporaryPassword: mustChangePassword ? password : null,
       isLocked: false,
