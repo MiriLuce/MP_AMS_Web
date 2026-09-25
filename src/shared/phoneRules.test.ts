@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatPhoneNumber, validatePhoneNumber } from './phoneRule'
+import { formatPhoneNumber, validatePhoneNumber } from './phoneRules'
 
 describe('validatePhoneNumber', () => {
   it.each(['987654321', '987 654 321', '(01) 234-5678', '+51 987 654 321', '064-123456'])(

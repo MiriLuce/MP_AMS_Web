@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Badge, Button, Table, Text } from '@mantine/core'
 import { IconPencil } from '@tabler/icons-react'
-import { formatPhoneNumber } from '@/shared/phoneRule'
+import { formatPhoneNumber } from '@/shared/phoneRules'
 import AccountBlock from './AccountBlock'
 import ContactForm from './ContactForm'
 import FieldGrid from './FieldGrid'

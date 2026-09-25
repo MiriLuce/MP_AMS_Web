@@ -2,7 +2,7 @@ import { ActionIcon, Button, Group, Radio, Select, Stack, Text, TextInput } from
 import type { UseFormReturnType } from '@mantine/form'
 import { IconPlus, IconTrash } from '@tabler/icons-react'
 import type { PhoneTypeResponse } from '@/core/api/catalogs/types'
-import { formatPhoneNumber } from '@/shared/phoneRule'
+import { formatPhoneNumber } from '@/shared/phoneRules'
 import {
   addPhone,
   removePhone,

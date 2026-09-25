@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { validateEmail } from './emailRule'
+import { validateEmail } from './emailRules'
 
 describe('validateEmail', () => {
   it('treats an empty value as valid, since the email is optional', () => {

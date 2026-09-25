@@ -63,6 +63,10 @@ src/
 
 **`core/` vs `shared/` vs `features/`** — the question is _how many of these will there be?_ One instance (layout, routing, api client, session) → `core/`. Many reusable pieces → `shared/`. Everything about one product area → `features/<feature>/`.
 
+Two placements that are easy to get wrong: `InactivityLock` lives in `core/session/`, not `core/routing/` — it is mounted as a route only to wrap the protected screens; what it does is session policy (lock, end on expiry). And a module that mirrors a backend validator is named in the plural like its backend counterpart: `passwordRules`, `identifierRules`, `emailRules`, `phoneRules` (`ContactRules`, `IdentifierRules`).
+
+Deferred until growth justifies them (24-sep-2026): the status pages out of `core/routing/`, a `contact/` subfolder in `features/account/`, `Field`/`FieldGrid`/`AccountBlock` promoted to `shared/` when a second detail screen needs them, and `shared/` split into components and validation past ~10 files.
+
 Folders are created when their first real file exists. A placeholder does not count: git does not version empty directories, and a folder that exists before its purpose does is a folder nobody can explain.
 
 ### Feature colocation
@@ -101,7 +105,7 @@ The store **does not authenticate** — hence `startSession(token)` / `endSessio
 
 ### Tests
 
-Vitest + Testing Library, in `jsdom`. A test lives next to what it tests (`phoneRule.ts` → `phoneRule.test.ts`). `src/test/` holds the shared pieces: `setup.ts` (jest-dom matchers and the `matchMedia`/`ResizeObserver` stubs Mantine needs in jsdom), `renderWithProviders` (router, Mantine theme and a fresh `QueryClient` without retries) and `startTestSession` (a real `startSession` call with a hand-built JWT).
+Vitest + Testing Library, in `jsdom`. A test lives next to what it tests (`phoneRules.ts` → `phoneRules.test.ts`). `src/test/` holds the shared pieces: `setup.ts` (jest-dom matchers and the `matchMedia`/`ResizeObserver` stubs Mantine needs in jsdom), `renderWithProviders` (router, Mantine theme and a fresh `QueryClient` without retries) and `startTestSession` (a real `startSession` call with a hand-built JWT).
 
 What gets a test:
 
