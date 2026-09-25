@@ -79,6 +79,21 @@ describe('toApiError', () => {
     },
   )
 
+  it('maps a 429 to rateLimited with the backend message', () => {
+    const error = toApiError(
+      responseError(429, {
+        code: 'AUTH_TOO_MANY_ATTEMPTS',
+        message: 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.',
+      }),
+    )
+
+    expect(error).toMatchObject({
+      kind: 'rateLimited',
+      code: 'AUTH_TOO_MANY_ATTEMPTS',
+      message: 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.',
+    })
+  })
+
   it('treats a text body as unexpected, whatever its status', () => {
     const error = toApiError(responseError(403, '<html>Site Disabled</html>'))
 

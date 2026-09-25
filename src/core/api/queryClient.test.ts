@@ -15,6 +15,7 @@ const errors: Record<ApiError['kind'], ApiError> = {
     errors: {},
   },
   business: { kind: 'business', code: 'SY_USER_NOT_FOUND', message: '', traceId: '' },
+  rateLimited: { kind: 'rateLimited', code: 'AUTH_TOO_MANY_ATTEMPTS', message: '', traceId: '' },
   forbidden: { kind: 'forbidden', code: 'AUTH_FORBIDDEN', message: '', traceId: '' },
   unauthenticated: {
     kind: 'unauthenticated',
@@ -31,7 +32,7 @@ describe('shouldRetry', () => {
     expect(shouldRetry(3, asError(errors[kind]))).toBe(false)
   })
 
-  it.each(['validation', 'business', 'forbidden', 'unauthenticated'] as const)(
+  it.each(['validation', 'business', 'rateLimited', 'forbidden', 'unauthenticated'] as const)(
     'never retries a %s error',
     (kind) => {
       expect(shouldRetry(0, asError(errors[kind]))).toBe(false)

@@ -80,6 +80,14 @@ export function toApiError(error: unknown): ApiError {
         traceId,
       }
 
+    case 429:
+      return {
+        kind: 'rateLimited',
+        code: body.code ?? 'AUTH_TOO_MANY_ATTEMPTS',
+        message: body.message ?? 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.',
+        traceId,
+      }
+
     default:
       return {
         kind: 'unknown',

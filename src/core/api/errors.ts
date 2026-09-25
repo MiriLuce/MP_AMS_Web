@@ -31,6 +31,12 @@ type BusinessError = {
     | (string & {})
   traceId: string
 }
+type RateLimitedError = {
+  kind: 'rateLimited'
+  message: string
+  code: 'AUTH_TOO_MANY_ATTEMPTS' | (string & {})
+  traceId: string
+}
 type UnknownError = {
   kind: 'unknown'
   message: string
@@ -48,5 +54,6 @@ export type ApiError =
   | ForbiddenError
   | UnauthenticatedError
   | BusinessError
+  | RateLimitedError
   | UnknownError
   | NetworkError
