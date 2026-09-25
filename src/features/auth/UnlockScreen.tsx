@@ -1,17 +1,13 @@
 import { Button, Group, PasswordInput, Stack, Text, ThemeIcon, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconLock } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
 
 import { useSessionStore } from '@/core/session/store'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
-import type { ApiError } from '@/core/api/errors'
-import type { LoginRequest, LoginResponse } from './types'
-import { login } from './api'
+import { useLoginMutation } from './useLoginMutation'
 import { BRAND_NAME } from '@/core/brand'
 
 function UnlockScreen() {
-  const startSession = useSessionStore((state) => state.startSession)
   const endSession = useSessionStore((state) => state.endSession)
   const authState = useSessionStore((state) => state.authState)
 
@@ -23,19 +19,7 @@ function UnlockScreen() {
     },
   })
 
-  const loginMutation = useMutation<LoginResponse, ApiError, LoginRequest>({
-    mutationFn: login,
-    onSuccess: (response, variables) => {
-      startSession({
-        token: response.accessToken,
-        userName: response.user.userName,
-        firstName: response.user.firstName,
-        fatherLastName: response.user.fatherLastName,
-        mustChangePassword: response.mustChangePassword,
-        password: variables.password,
-      })
-    },
-  })
+  const loginMutation = useLoginMutation()
 
   if (authState === null) return null
 

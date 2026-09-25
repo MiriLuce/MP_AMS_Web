@@ -1,19 +1,15 @@
-import { Button, Container, List, Paper, PasswordInput, Stack, Text, Title } from '@mantine/core'
+import { Button, Container, Paper, PasswordInput, Stack, Text, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useNavigate } from 'react-router'
 import { useMutation } from '@tanstack/react-query'
 
 import { useSessionStore } from '@/core/session/store'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
-import InfoAlert from '@/shared/InfoAlert'
 import type { ApiError } from '@/core/api/errors'
 import type { ChangePasswordRequest, ChangePasswordResponse } from './types'
 import { changePassword } from './api'
-import {
-  PASSWORD_REQUIREMENTS,
-  validateNewPassword,
-  validatePasswordConfirmation,
-} from './passwordRules'
+import PasswordRequirements from './PasswordRequirements'
+import { validateNewPassword, validatePasswordConfirmation } from './passwordRules'
 
 function SetPasswordPage() {
   const temporaryPassword = useSessionStore((state) => state.authState?.temporaryPassword ?? null)
@@ -65,16 +61,7 @@ function SetPasswordPage() {
           <Stack gap="md">
             {setPasswordMutation.isError && <ApiErrorAlert error={setPasswordMutation.error} />}
 
-            <InfoAlert
-              title="Requisitos de la contraseña"
-              message={
-                <List size="sm" spacing={2} mt="xs">
-                  {PASSWORD_REQUIREMENTS.map((requirement) => (
-                    <List.Item key={requirement}>{requirement}</List.Item>
-                  ))}
-                </List>
-              }
-            />
+            <PasswordRequirements title="Requisitos de la contraseña" />
 
             <PasswordInput
               label="Nueva contraseña"

@@ -1,18 +1,14 @@
-import { Alert, Button, Container, List, Paper, PasswordInput, Stack } from '@mantine/core'
+import { Alert, Button, Container, Paper, PasswordInput, Stack } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconCheck } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
-import InfoAlert from '@/shared/InfoAlert'
 import type { ApiError } from '@/core/api/errors'
 import type { ChangePasswordRequest, ChangePasswordResponse } from './types'
 import { changePassword } from './api'
-import {
-  PASSWORD_REQUIREMENTS,
-  validateNewPassword,
-  validatePasswordConfirmation,
-} from './passwordRules'
+import PasswordRequirements from './PasswordRequirements'
+import { validateNewPassword, validatePasswordConfirmation } from './passwordRules'
 import PageHeader from '@/shared/PageHeader'
 
 function ChangePasswordPage() {
@@ -63,16 +59,7 @@ function ChangePasswordPage() {
               </Alert>
             )}
 
-            <InfoAlert
-              title="Requisitos de la nueva contraseña"
-              message={
-                <List size="sm" spacing={2} mt="xs">
-                  {PASSWORD_REQUIREMENTS.map((requirement) => (
-                    <List.Item key={requirement}>{requirement}</List.Item>
-                  ))}
-                </List>
-              }
-            />
+            <PasswordRequirements title="Requisitos de la nueva contraseña" />
 
             <PasswordInput
               label="Contraseña actual"

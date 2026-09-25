@@ -15,62 +15,30 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useNavigate } from 'react-router'
-import { useMutation } from '@tanstack/react-query'
 
-import { useSessionStore } from '@/core/session/store'
 import ApiErrorAlert from '@/shared/ApiErrorAlert'
-import type { ApiError } from '@/core/api/errors'
-import type { LoginRequest, LoginResponse } from './types'
-import { login } from './api'
+import { validateUserName } from './identifierRules'
+import { useLoginMutation } from './useLoginMutation'
 import classes from './LoginPage.module.css'
 import { BRAND_NAME } from '@/core/brand'
 import logoElAlba from '@/assets/logos/logoElAlba.svg'
 import logoMaxPlanck from '@/assets/logos/logoMaxPlanck.svg'
 import logoNuevoHorizonte from '@/assets/logos/logoNuevoHorizonte.svg'
 
-const USER_NAME_MAX_LENGTH = 20
-
 function LoginPage() {
-  const startSession = useSessionStore((state) => state.startSession)
   const navigate = useNavigate()
 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: { userName: '', password: '' },
     validate: {
-      userName: (value: string) => {
-        if (!value.trim()) {
-          return 'El nombre de usuario es obligatorio.'
-        }
-        if (value.length > USER_NAME_MAX_LENGTH) {
-          return `El nombre de usuario no puede exceder ${USER_NAME_MAX_LENGTH} caracteres.`
-        }
-        if (!/^[a-zA-Z0-9]+$/.test(value)) {
-          return 'El nombre de usuario solo puede contener letras y dígitos, sin espacios, tildes ni símbolos.'
-        }
-        return null
-      },
+      userName: validateUserName,
       password: (value) => (value.trim() ? null : 'La contraseña es obligatoria.'),
     },
   })
 
-  const loginMutation = useMutation<LoginResponse, ApiError, LoginRequest>({
-    mutationFn: login,
-    onSuccess: (response, variables) => {
-      startSession({
-        token: response.accessToken,
-        userName: response.user.userName,
-        firstName: response.user.firstName,
-        fatherLastName: response.user.fatherLastName,
-        mustChangePassword: response.mustChangePassword,
-        password: variables.password,
-      })
-      if (response.mustChangePassword) {
-        navigate('/set-password', { replace: true })
-        return
-      }
-      navigate('/', { replace: true })
-    },
+  const loginMutation = useLoginMutation((response) => {
+    navigate(response.mustChangePassword ? '/set-password' : '/', { replace: true })
   })
 
   return (
