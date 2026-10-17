@@ -8,11 +8,7 @@ type ValidationError = {
 type UnauthenticatedError = {
   kind: 'unauthenticated'
   message: string
-  code:
-    | 'AUTH_UNAUTHENTICATED'
-    | 'AUTH_INVALID_CREDENTIALS'
-    | 'AUTH_USER_NOT_FOUND_OR_INACTIVE'
-    | (string & {})
+  code: 'AUTH_UNAUTHENTICATED' | 'AUTH_INVALID_CREDENTIALS' | 'AUTH_SESSION_EXPIRED' | (string & {})
   traceId: string
 }
 type ForbiddenError = {
