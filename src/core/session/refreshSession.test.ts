@@ -1,28 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { refresh } from '@/features/auth/api'
-import type { LoginResponse } from '@/features/auth/types'
+import { testLoginResponse } from '@/test/session'
 import { refreshSession } from './refreshSession'
 
 vi.mock('@/features/auth/api', () => ({ refresh: vi.fn() }))
 
-const response: LoginResponse = {
-  accessToken: 'new-token',
-  tokenType: 'Bearer',
-  expiresIn: 900,
-  mustChangePassword: false,
-  user: {
-    userId: 7,
-    userName: '72782793',
-    typeDocumentIdentity: 'DNI',
-    documentIdentity: '72782793',
-    firstName: 'Miriam',
-    middleName: null,
-    fatherLastName: 'Encarnacion',
-    motherLastName: null,
-    email: 'miriam@example.com',
-    roles: ['Admin'],
-  },
-}
+const response = testLoginResponse()
 
 beforeEach(() => {
   vi.mocked(refresh).mockReset()

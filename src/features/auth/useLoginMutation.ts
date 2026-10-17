@@ -10,14 +10,7 @@ export function useLoginMutation(onLoggedIn?: (response: LoginResponse) => void)
   return useMutation<LoginResponse, ApiError, LoginRequest>({
     mutationFn: login,
     onSuccess: (response, variables) => {
-      startSession({
-        token: response.accessToken,
-        userName: response.user.userName,
-        firstName: response.user.firstName,
-        fatherLastName: response.user.fatherLastName,
-        mustChangePassword: response.mustChangePassword,
-        password: variables.password,
-      })
+      startSession(response, variables.password)
       onLoggedIn?.(response)
     },
   })

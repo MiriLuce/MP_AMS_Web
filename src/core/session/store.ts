@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { jwtDecode } from 'jwt-decode'
 
 import { queryClient } from '@/core/api/queryClient'
+import type { LoginResponse } from '@/features/auth/types'
 
 type AuthState = {
   token: string
@@ -17,25 +18,21 @@ type AuthState = {
   isLocked: boolean
 }
 
-type StartSessionInput = {
-  token: string
-  userName: string
-  firstName: string
-  fatherLastName: string
-  mustChangePassword: boolean
-  password: string
-}
+type EndReason = 'logout' | 'expired'
 
 type SessionStore = {
   authState: AuthState | null
-  startSession: (input: StartSessionInput) => void
-  endSession: () => void
+  isRestoring: boolean
+  endReason: EndReason | null
+  startSession: (response: LoginResponse, password?: string) => void
+  sessionRenewed: (response: LoginResponse) => void
+  finishRestoring: () => void
+  endSession: (reason: EndReason) => void
   lockSession: () => void
   passwordChanged: () => void
 }
 
 type DecodedToken = {
-  exp: number
   sub: string
   role?: string | string[]
   permission?: string | string[]
@@ -44,27 +41,44 @@ type DecodedToken = {
 const toClaimSet = (claim: string | string[] | undefined) =>
   new Set(claim === undefined ? [] : Array.isArray(claim) ? claim : [claim])
 
+const readToken = (response: LoginResponse) => {
+  const decodedToken: DecodedToken = jwtDecode(response.accessToken)
+  return {
+    token: response.accessToken,
+    expiresAt: Date.now() + response.expiresIn * 1000,
+    userId: decodedToken.sub,
+    roles: toClaimSet(decodedToken.role),
+    permissions: toClaimSet(decodedToken.permission),
+  }
+}
+
 export const useSessionStore = create<SessionStore>((set) => ({
   authState: null,
-  startSession: ({ token, userName, firstName, fatherLastName, mustChangePassword, password }) => {
-    const decodedToken: DecodedToken = jwtDecode(token)
+  isRestoring: true,
+  endReason: null,
+  startSession: (response, password) => {
+    const { user, mustChangePassword } = response
     const authState = {
-      token: token,
-      expiresAt: decodedToken.exp * 1000,
-      userId: decodedToken.sub,
-      userName: userName,
-      displayName: `${firstName} ${fatherLastName}`,
-      avatarName: `${firstName[0]}${fatherLastName[0]}`,
-      roles: toClaimSet(decodedToken.role),
-      permissions: toClaimSet(decodedToken.permission),
+      ...readToken(response),
+      userName: user.userName,
+      displayName: `${user.firstName} ${user.fatherLastName}`,
+      avatarName: `${user.firstName[0]}${user.fatherLastName[0]}`,
       mustChangePassword: mustChangePassword,
-      temporaryPassword: mustChangePassword ? password : null,
+      temporaryPassword: mustChangePassword ? (password ?? null) : null,
       isLocked: false,
     }
-    set({ authState })
+    set({ authState, isRestoring: false, endReason: null })
   },
-  endSession: () => {
-    set({ authState: null })
+  sessionRenewed: (response) => {
+    set((state) => ({
+      authState: state.authState ? { ...state.authState, ...readToken(response) } : null,
+    }))
+  },
+  finishRestoring: () => {
+    set({ isRestoring: false })
+  },
+  endSession: (reason) => {
+    set({ authState: null, endReason: reason })
     queryClient.clear()
   },
   lockSession: () => {

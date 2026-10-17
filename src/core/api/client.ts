@@ -33,7 +33,7 @@ apiClient.interceptors.response.use(
     }
 
     if (apiError.kind === 'unauthenticated' && useSessionStore.getState().authState !== null) {
-      useSessionStore.getState().endSession()
+      useSessionStore.getState().endSession('expired')
     }
     return Promise.reject(apiError)
   },

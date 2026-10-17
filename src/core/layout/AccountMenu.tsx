@@ -44,7 +44,7 @@ function AccountMenu() {
           Cambiar contraseña
         </Menu.Item>
         <Menu.Divider />
-        <Menu.Item leftSection={<IconLogout size={14} />} onClick={endSession}>
+        <Menu.Item leftSection={<IconLogout size={14} />} onClick={() => endSession('logout')}>
           Cerrar sesión
         </Menu.Item>
       </Menu.Dropdown>

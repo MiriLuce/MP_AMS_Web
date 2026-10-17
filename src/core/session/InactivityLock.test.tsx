@@ -62,7 +62,7 @@ describe('InactivityLock', () => {
   })
 
   it('ends the session when the token expires, even if it is locked', () => {
-    startTestSession({ expiresAt: Date.now() + 5 * MINUTE })
+    startTestSession({ expiresIn: 5 * 60 })
     useSessionStore.getState().lockSession()
     renderLock()
 

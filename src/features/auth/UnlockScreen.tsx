@@ -79,7 +79,7 @@ function UnlockScreen() {
       </form>
 
       <Group justify="center">
-        <Button type="button" variant="subtle" size="sm" onClick={endSession}>
+        <Button type="button" variant="subtle" size="sm" onClick={() => endSession('logout')}>
           Cerrar sesión
         </Button>
       </Group>

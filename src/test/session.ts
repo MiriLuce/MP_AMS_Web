@@ -1,4 +1,5 @@
 import { useSessionStore } from '@/core/session/store'
+import type { LoginResponse } from '@/features/auth/types'
 
 const base64Url = (value: object) =>
   btoa(JSON.stringify(value)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
@@ -9,22 +10,36 @@ export function testToken(claims: object) {
 
 type Options = {
   claims?: object
-  expiresAt?: number
+  expiresIn?: number
   mustChangePassword?: boolean
 }
 
-export function startTestSession({
+export function testLoginResponse({
   claims = {},
-  expiresAt = 2_000_000_000_000,
+  expiresIn = 60 * 60,
   mustChangePassword = false,
-}: Options = {}) {
-  useSessionStore.getState().startSession({
-    token: testToken({ exp: Math.floor(expiresAt / 1000), sub: '7', ...claims }),
-    userName: '72782793',
-    firstName: 'Miriam',
-    fatherLastName: 'Encarnacion',
+}: Options = {}): LoginResponse {
+  return {
+    accessToken: testToken({ sub: '7', ...claims }),
+    tokenType: 'Bearer',
+    expiresIn,
     mustChangePassword,
-    password: 'Temporal123!',
-  })
+    user: {
+      userId: 7,
+      userName: '72782793',
+      typeDocumentIdentity: 'DNI',
+      documentIdentity: '72782793',
+      firstName: 'Miriam',
+      middleName: null,
+      fatherLastName: 'Encarnacion',
+      motherLastName: null,
+      email: 'miriam@example.com',
+      roles: ['Admin'],
+    },
+  }
+}
+
+export function startTestSession(options: Options = {}) {
+  useSessionStore.getState().startSession(testLoginResponse(options), 'Temporal123!')
   return useSessionStore.getState().authState!
 }

@@ -1,30 +1,39 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryClient } from '@/core/api/queryClient'
-import { testToken } from '@/test/session'
+import { testLoginResponse, testToken } from '@/test/session'
 import { useSessionStore } from './store'
 
+const NOW = new Date('2026-10-16T12:00:00-05:00').getTime()
+
 function start(claims: object, mustChangePassword = false) {
-  useSessionStore.getState().startSession({
-    token: testToken({ exp: 2_000_000_000, sub: '7', ...claims }),
-    userName: '72782793',
-    firstName: 'Miriam',
-    fatherLastName: 'Encarnacion',
-    mustChangePassword,
-    password: 'Temporal123!',
-  })
+  useSessionStore
+    .getState()
+    .startSession(testLoginResponse({ claims, mustChangePassword }), 'Temporal123!')
   return useSessionStore.getState().authState!
 }
 
+beforeEach(() => {
+  vi.useFakeTimers()
+  vi.setSystemTime(NOW)
+})
+
 afterEach(() => {
-  useSessionStore.setState({ authState: null })
+  vi.useRealTimers()
+  useSessionStore.setState({ authState: null, isRestoring: true, endReason: null })
 })
 
 describe('startSession', () => {
-  it('reads expiry and subject from the token', () => {
-    const authState = start({})
+  it('reads the subject from the token', () => {
+    expect(start({}).userId).toBe('7')
+  })
 
-    expect(authState.expiresAt).toBe(2_000_000_000_000)
-    expect(authState.userId).toBe('7')
+  it('computes expiry from expiresIn with the local clock, not from the token exp', () => {
+    const response = testLoginResponse({ expiresIn: 15 * 60 })
+    response.accessToken = testToken({ sub: '7', exp: (NOW - 10 * 60_000) / 1000 })
+
+    useSessionStore.getState().startSession(response)
+
+    expect(useSessionStore.getState().authState?.expiresAt).toBe(NOW + 15 * 60_000)
   })
 
   it('builds the display name and avatar from the login response', () => {
@@ -50,9 +59,39 @@ describe('startSession', () => {
     expect(start({}, true).temporaryPassword).toBe('Temporal123!')
     expect(start({}, false).temporaryPassword).toBeNull()
   })
+
+  it('starts from a refresh response, which carries no password', () => {
+    useSessionStore.getState().startSession(testLoginResponse())
+
+    expect(useSessionStore.getState()).toMatchObject({
+      authState: { temporaryPassword: null },
+      isRestoring: false,
+    })
+  })
+
+  it('forgets why the previous session ended', () => {
+    useSessionStore.getState().endSession('expired')
+
+    start({})
+
+    expect(useSessionStore.getState().endReason).toBeNull()
+  })
 })
 
 describe('session transitions', () => {
+  it('sessionRenewed replaces token, expiry and permissions, and keeps the lock', () => {
+    start({ permission: 'A' })
+    useSessionStore.getState().lockSession()
+    vi.setSystemTime(NOW + 10 * 60_000)
+
+    useSessionStore.getState().sessionRenewed(testLoginResponse({ claims: { permission: 'B' } }))
+
+    const authState = useSessionStore.getState().authState!
+    expect(authState.expiresAt).toBe(NOW + 10 * 60_000 + 60 * 60_000)
+    expect(authState.permissions).toEqual(new Set(['B']))
+    expect(authState.isLocked).toBe(true)
+  })
+
   it('lockSession locks, and a second call leaves the state untouched', () => {
     start({})
     useSessionStore.getState().lockSession()
@@ -75,13 +114,19 @@ describe('session transitions', () => {
     })
   })
 
-  it('endSession clears the session and the query cache', () => {
+  it('finishRestoring ends the restoring state without a session', () => {
+    useSessionStore.getState().finishRestoring()
+
+    expect(useSessionStore.getState()).toMatchObject({ authState: null, isRestoring: false })
+  })
+
+  it('endSession clears the session and the query cache, and records why', () => {
     const clear = vi.spyOn(queryClient, 'clear')
     start({})
 
-    useSessionStore.getState().endSession()
+    useSessionStore.getState().endSession('expired')
 
-    expect(useSessionStore.getState().authState).toBeNull()
+    expect(useSessionStore.getState()).toMatchObject({ authState: null, endReason: 'expired' })
     expect(clear).toHaveBeenCalledOnce()
     clear.mockRestore()
   })

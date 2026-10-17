@@ -35,7 +35,7 @@ function InactivityLock() {
 
     const checkSession = () => {
       if (isTokenExpired()) {
-        endSession()
+        endSession('expired')
         return false
       }
       if (isInactive()) {
